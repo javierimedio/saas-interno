@@ -354,6 +354,227 @@ export interface Database {
         }
         Relationships: []
       }
+      one_on_ones: {
+        Row: {
+          id: string
+          organization_id: string
+          person_id: string
+          manager_id: string
+          scheduled_at: string
+          actual_started_at: string | null
+          actual_ended_at: string | null
+          status: Database['public']['Enums']['one_on_one_status']
+          mode: Database['public']['Enums']['meeting_mode']
+          manager_comments: string | null
+          employee_comments: string | null
+          overall_rating: number | null
+          next_meeting_suggested_at: string | null
+          created_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          person_id: string
+          manager_id: string
+          scheduled_at: string
+          actual_started_at?: string | null
+          actual_ended_at?: string | null
+          status?: Database['public']['Enums']['one_on_one_status']
+          mode?: Database['public']['Enums']['meeting_mode']
+          manager_comments?: string | null
+          employee_comments?: string | null
+          overall_rating?: number | null
+          next_meeting_suggested_at?: string | null
+          created_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          person_id?: string
+          manager_id?: string
+          scheduled_at?: string
+          actual_started_at?: string | null
+          actual_ended_at?: string | null
+          status?: Database['public']['Enums']['one_on_one_status']
+          mode?: Database['public']['Enums']['meeting_mode']
+          manager_comments?: string | null
+          employee_comments?: string | null
+          overall_rating?: number | null
+          next_meeting_suggested_at?: string | null
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'one_on_ones_person_id_fkey'
+            columns: ['person_id']
+            isOneToOne: false
+            referencedRelation: 'people'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'one_on_ones_manager_id_fkey'
+            columns: ['manager_id']
+            isOneToOne: false
+            referencedRelation: 'people'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      one_on_one_agenda_items: {
+        Row: {
+          id: string
+          one_on_one_id: string
+          topic: string
+          source: string
+          position: number
+          discussed: boolean
+          notes: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          one_on_one_id: string
+          topic: string
+          source?: string
+          position?: number
+          discussed?: boolean
+          notes?: string | null
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          one_on_one_id?: string
+          topic?: string
+          source?: string
+          position?: number
+          discussed?: boolean
+          notes?: string | null
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'one_on_one_agenda_items_one_on_one_id_fkey'
+            columns: ['one_on_one_id']
+            isOneToOne: false
+            referencedRelation: 'one_on_ones'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      one_on_one_agreements: {
+        Row: {
+          id: string
+          one_on_one_id: string
+          description: string
+          created_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          one_on_one_id: string
+          description: string
+          created_by: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          one_on_one_id?: string
+          description?: string
+          created_by?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'one_on_one_agreements_one_on_one_id_fkey'
+            columns: ['one_on_one_id']
+            isOneToOne: false
+            referencedRelation: 'one_on_ones'
+            referencedColumns: ['id']
+          },
+        ]
+      }
+      actions: {
+        Row: {
+          id: string
+          organization_id: string
+          person_id: string
+          assignee_id: string
+          one_on_one_id: string | null
+          title: string
+          description: string | null
+          status: Database['public']['Enums']['action_status']
+          priority: Database['public']['Enums']['action_priority']
+          due_date: string | null
+          blocked_reason: string | null
+          completed_at: string | null
+          created_by: string
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          person_id: string
+          assignee_id: string
+          one_on_one_id?: string | null
+          title: string
+          description?: string | null
+          status?: Database['public']['Enums']['action_status']
+          priority?: Database['public']['Enums']['action_priority']
+          due_date?: string | null
+          blocked_reason?: string | null
+          completed_at?: string | null
+          created_by: string
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          person_id?: string
+          assignee_id?: string
+          one_on_one_id?: string | null
+          title?: string
+          description?: string | null
+          status?: Database['public']['Enums']['action_status']
+          priority?: Database['public']['Enums']['action_priority']
+          due_date?: string | null
+          blocked_reason?: string | null
+          completed_at?: string | null
+          created_by?: string
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'actions_person_id_fkey'
+            columns: ['person_id']
+            isOneToOne: false
+            referencedRelation: 'people'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'actions_assignee_id_fkey'
+            columns: ['assignee_id']
+            isOneToOne: false
+            referencedRelation: 'people'
+            referencedColumns: ['id']
+          },
+          {
+            foreignKeyName: 'actions_one_on_one_id_fkey'
+            columns: ['one_on_one_id']
+            isOneToOne: false
+            referencedRelation: 'one_on_ones'
+            referencedColumns: ['id']
+          },
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -395,6 +616,10 @@ export interface Database {
       document_category: 'contract' | 'id_document' | 'review' | 'certificate' | 'other'
       audit_action: 'create' | 'update' | 'delete'
       note_visibility: 'manager_only' | 'admin_only'
+      one_on_one_status: 'scheduled' | 'preparing' | 'in_progress' | 'completed' | 'cancelled'
+      meeting_mode: 'in_person' | 'video' | 'phone'
+      action_status: 'pending' | 'in_progress' | 'blocked' | 'completed' | 'cancelled'
+      action_priority: 'low' | 'medium' | 'high' | 'urgent'
     }
   }
 }

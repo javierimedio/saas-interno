@@ -21,12 +21,12 @@ import { cn } from '@/lib/utils'
  * "Pronto" para no ocultar la visión completa del producto ni ofrecer enlaces rotos.
  */
 const NAV_ITEMS = [
-  { href: '/hoy', label: 'Hoy', icon: LayoutGrid, enabled: false },
+  { href: '/hoy', label: 'Hoy', icon: LayoutGrid, enabled: true },
   { href: '/people', label: 'Personas', icon: Users, enabled: true },
-  { href: '/one-on-ones', label: 'One2One', icon: Video, enabled: false },
+  { href: '/one-on-ones', label: 'One2One', icon: Video, enabled: true },
   { href: '/actions', label: 'Acciones', icon: CheckSquare, enabled: false },
   { href: '/development', label: 'Desarrollo', icon: TrendingUp, enabled: false },
-  { href: '/calendar', label: 'Calendario', icon: CalendarDays, enabled: false },
+  { href: '/calendar', label: 'Calendario', icon: CalendarDays, enabled: true },
   { href: '/reports', label: 'Informes', icon: FileText, enabled: false },
 ] as const
 

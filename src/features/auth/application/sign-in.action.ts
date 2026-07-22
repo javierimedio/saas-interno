@@ -19,7 +19,7 @@ export async function signInAction(input: SignInInput): Promise<Result<null>> {
     return err('Email o contraseña incorrectos')
   }
 
-  redirect('/people')
+  redirect('/hoy')
 }
 
 export async function signOutAction() {

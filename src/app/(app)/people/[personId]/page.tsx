@@ -16,6 +16,9 @@ import { PersonTimeline } from '@/features/people/ui/person-timeline'
 import { SalaryHistoryPanel } from '@/features/people/ui/salary-history-panel'
 import { DocumentsPanel } from '@/features/people/ui/documents-panel'
 import { PrivateNotesPanel } from '@/features/people/ui/private-notes-panel'
+import { listMeetingsByPerson } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
+import { PersonMeetingsPanel } from '@/features/one-on-ones/ui/person-meetings-panel'
+import { listActionsByPerson } from '@/features/actions/infrastructure/actions.repository'
 
 export default async function PersonProfilePage({ params }: { params: Promise<{ personId: string }> }) {
   const { personId } = await params
@@ -26,12 +29,14 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
     notFound()
   }
 
-  const [departments, salaryRecords, documents, privateNotes, auditEvents] = await Promise.all([
+  const [departments, salaryRecords, documents, privateNotes, auditEvents, meetings, actions] = await Promise.all([
     listDepartments(supabase, person.organization_id),
     listSalaryRecords(supabase, person.id),
     listDocuments(supabase, person.id),
     listPrivateNotes(supabase, person.id),
     listAuditEventsForPerson(supabase, person.id),
+    listMeetingsByPerson(supabase, person.id),
+    listActionsByPerson(supabase, person.id),
   ])
 
   let managerName: string | undefined
@@ -41,8 +46,15 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
   }
 
   const departmentName = departments.find((d) => d.id === person.department_id)?.name
-  const timeline = buildPersonTimeline(auditEvents, salaryRecords, documents)
+  const timeline = buildPersonTimeline(auditEvents, salaryRecords, documents, meetings, actions)
   const now = new Date()
+
+  const upcoming = meetings
+    .filter((m) => (m.status === 'scheduled' || m.status === 'preparing') && new Date(m.scheduled_at) >= now)
+    .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())[0]
+  const lastCompleted = meetings
+    .filter((m) => m.status === 'completed')
+    .sort((a, b) => new Date(b.scheduled_at).getTime() - new Date(a.scheduled_at).getTime())[0]
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
@@ -51,6 +63,9 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
         hireDate={person.hire_date}
         terminationDate={person.termination_date}
         latestSalary={salaryRecords[0]}
+        nextMeetingAt={upcoming?.scheduled_at}
+        lastMeetingAt={lastCompleted?.actual_ended_at ?? lastCompleted?.scheduled_at}
+        lastMeetingRating={lastCompleted?.overall_rating}
         now={now}
       />
 
@@ -59,6 +74,17 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
       <section id="cronologia" className="scroll-mt-16">
         <h2 className="mb-3 text-sm font-semibold">Cronología</h2>
         <PersonTimeline events={timeline} />
+      </section>
+
+      <section id="one-on-one" className="scroll-mt-16">
+        <Card>
+          <CardHeader>
+            <CardTitle>One2One</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PersonMeetingsPanel personId={person.id} meetings={meetings} />
+          </CardContent>
+        </Card>
       </section>
 
       <section id="compensacion" className="scroll-mt-16">

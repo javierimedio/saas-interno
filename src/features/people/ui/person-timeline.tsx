@@ -1,4 +1,4 @@
-import { Banknote, FileText, Sparkles, UserRoundCog, UserRoundX } from 'lucide-react'
+import { Banknote, CheckCircle2, FileText, Sparkles, UserRoundCog, UserRoundX, Video } from 'lucide-react'
 
 import { EmptyState } from '@/components/shared/empty-state'
 import { groupTimelineByMonth } from '../application/build-person-timeline'
@@ -10,6 +10,9 @@ const ICONS: Record<PersonTimelineEventType, typeof Sparkles> = {
   field_change: UserRoundCog,
   salary_change: Banknote,
   document_added: FileText,
+  one_on_one: Video,
+  action_created: CheckCircle2,
+  action_completed: CheckCircle2,
 }
 
 const NODE_CLASSES: Record<PersonTimelineEventType, string> = {
@@ -18,6 +21,9 @@ const NODE_CLASSES: Record<PersonTimelineEventType, string> = {
   field_change: 'bg-accent text-accent-foreground',
   salary_change: 'bg-warning-soft text-warning',
   document_added: 'bg-muted text-muted-foreground',
+  one_on_one: 'bg-accent text-accent-foreground',
+  action_created: 'bg-warning-soft text-warning',
+  action_completed: 'bg-success-soft text-success',
 }
 
 export function PersonTimeline({ events }: { events: PersonTimelineEvent[] }) {

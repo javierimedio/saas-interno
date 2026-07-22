@@ -2,6 +2,8 @@ import type { AuditLogRow } from '../infrastructure/audit-log.repository'
 import type { SalaryRecordRow } from '../infrastructure/salary-records.repository'
 import type { DocumentRow } from '../infrastructure/documents.repository'
 import type { PersonTimelineEvent } from '../domain/timeline-event'
+import type { OneOnOneRow } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
+import type { ActionRow } from '@/features/actions/infrastructure/actions.repository'
 
 const FIELD_LABELS: Record<string, string> = {
   position_title: 'puesto',
@@ -62,15 +64,45 @@ function eventFromDocument(row: DocumentRow): PersonTimelineEvent {
   }
 }
 
+function eventFromMeeting(row: OneOnOneRow): PersonTimelineEvent | null {
+  if (row.status !== 'completed' || !row.actual_ended_at) return null
+  return {
+    id: row.id,
+    type: 'one_on_one',
+    occurredAt: row.actual_ended_at,
+    title: '1:1 realizado',
+    detail: row.overall_rating ? `Valoración ${row.overall_rating}/5` : undefined,
+  }
+}
+
+function eventsFromAction(row: ActionRow): PersonTimelineEvent[] {
+  const events: PersonTimelineEvent[] = [
+    { id: `${row.id}-created`, type: 'action_created', occurredAt: row.created_at, title: `Acción creada: ${row.title}` },
+  ]
+  if (row.status === 'completed' && row.completed_at) {
+    events.push({
+      id: `${row.id}-completed`,
+      type: 'action_completed',
+      occurredAt: row.completed_at,
+      title: `Acción completada: ${row.title}`,
+    })
+  }
+  return events
+}
+
 export function buildPersonTimeline(
   auditRows: AuditLogRow[],
   salaryRows: SalaryRecordRow[],
   documentRows: DocumentRow[],
+  meetingRows: OneOnOneRow[] = [],
+  actionRows: ActionRow[] = [],
 ): PersonTimelineEvent[] {
   const events = [
     ...auditRows.map(auditEventFromPeopleRow),
     ...salaryRows.map(eventFromSalaryRecord),
     ...documentRows.map(eventFromDocument),
+    ...meetingRows.map(eventFromMeeting).filter((e): e is PersonTimelineEvent => e !== null),
+    ...actionRows.flatMap(eventsFromAction),
   ]
 
   return events.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime())

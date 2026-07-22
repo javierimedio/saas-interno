@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils'
 
 const SECTIONS = [
   { id: 'cronologia', label: 'Cronología' },
+  { id: 'one-on-one', label: 'One2One' },
   { id: 'compensacion', label: 'Compensación' },
   { id: 'documentos', label: 'Documentos' },
   { id: 'notas', label: 'Notas' },

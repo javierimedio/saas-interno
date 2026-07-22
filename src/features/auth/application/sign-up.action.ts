@@ -37,5 +37,5 @@ export async function signUpAction(input: SignUpInput): Promise<Result<null>> {
     return err('La cuenta se creó pero no se pudo inicializar la organización')
   }
 
-  redirect('/people')
+  redirect('/hoy')
 }

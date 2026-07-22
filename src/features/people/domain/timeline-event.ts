@@ -10,6 +10,9 @@ export type PersonTimelineEventType =
   | 'field_change'
   | 'salary_change'
   | 'document_added'
+  | 'one_on_one'
+  | 'action_created'
+  | 'action_completed'
 
 export type PersonTimelineEvent = {
   id: string

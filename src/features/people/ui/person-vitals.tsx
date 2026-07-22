@@ -10,11 +10,17 @@ export function PersonVitals({
   hireDate,
   terminationDate,
   latestSalary,
+  nextMeetingAt,
+  lastMeetingAt,
+  lastMeetingRating,
   now,
 }: {
   hireDate: string
   terminationDate: string | null
   latestSalary?: SalaryRecordRow
+  nextMeetingAt?: string | null
+  lastMeetingAt?: string | null
+  lastMeetingRating?: number | null
   now: Date
 }) {
   const overdue = latestSalary ? isSalaryReviewOverdue(latestSalary.effective_date, now) : false
@@ -22,6 +28,19 @@ export function PersonVitals({
   return (
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <VitalCard label="Antigüedad" value={calculateTenure(hireDate, now, terminationDate)} />
+      <VitalCard
+        label="Próximo 1:1"
+        value={nextMeetingAt ? new Date(nextMeetingAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'Sin programar'}
+        tone={nextMeetingAt ? 'default' : 'warn'}
+      />
+      <VitalCard
+        label="Último 1:1"
+        value={
+          lastMeetingAt
+            ? `${new Date(lastMeetingAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}${lastMeetingRating ? ` · ${lastMeetingRating}/5` : ''}`
+            : '—'
+        }
+      />
       <VitalCard
         label="Compensación"
         value={
