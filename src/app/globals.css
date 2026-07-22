@@ -1,0 +1,131 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+@custom-variant dark (&:is(.dark *));
+
+:root {
+  --radius: 0.625rem;
+
+  /* Superficie y texto — docs/product-design/05-design-system.md §5.1 */
+  --background: #f5f6f8;
+  --foreground: #1b1f23;
+  --card: #ffffff;
+  --card-foreground: #1b1f23;
+  --popover: #ffffff;
+  --popover-foreground: #1b1f23;
+
+  /* Marca (teal) */
+  --primary: #1f6f78;
+  --primary-foreground: #ffffff;
+
+  --secondary: #fbfbfc;
+  --secondary-foreground: #1b1f23;
+
+  --muted: #edeef1;
+  --muted-foreground: #5b6470;
+
+  /* En shadcn/ui, "accent" es un fondo sutil de hover/selección, no el color de marca. */
+  --accent: #dceae6;
+  --accent-foreground: #16565d;
+
+  --destructive: #c0392b;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e5ea;
+  --input: #cdd2d9;
+  --ring: #1f6f78;
+
+  /* Semántica propia, no estándar de shadcn */
+  --success: #2e7d4f;
+  --success-foreground: #ffffff;
+  --success-soft: #e1f1e6;
+  --warning: #a8720b;
+  --warning-foreground: #ffffff;
+  --warning-soft: #fbedd3;
+  --text-faint: #939ba5;
+}
+
+.dark {
+  --background: #15181c;
+  --foreground: #eceef1;
+  --card: #1c2025;
+  --card-foreground: #eceef1;
+  --popover: #1c2025;
+  --popover-foreground: #eceef1;
+
+  --primary: #4fb4b8;
+  --primary-foreground: #0b2023;
+
+  --secondary: #191c20;
+  --secondary-foreground: #eceef1;
+
+  --muted: #23272c;
+  --muted-foreground: #96a0aa;
+
+  --accent: rgba(79, 180, 184, 0.14);
+  --accent-foreground: #78cbce;
+
+  --destructive: #e5675a;
+  --destructive-foreground: #0b0b0b;
+
+  --border: #2b3036;
+  --input: #383f47;
+  --ring: #4fb4b8;
+
+  --success: #5fbe86;
+  --success-foreground: #0b1a10;
+  --success-soft: rgba(95, 190, 134, 0.14);
+  --warning: #e0af3e;
+  --warning-foreground: #1a1200;
+  --warning-soft: rgba(224, 175, 62, 0.14);
+  --text-faint: #656f79;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-success-soft: var(--success-soft);
+  --color-warning: var(--warning);
+  --color-warning-foreground: var(--warning-foreground);
+  --color-warning-soft: var(--warning-soft);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-text-faint: var(--text-faint);
+
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  --font-sans:
+    ui-sans-serif, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --font-mono:
+    ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+}
+
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-variant-numeric: tabular-nums;
+  }
+}

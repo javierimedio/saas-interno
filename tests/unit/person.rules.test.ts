@@ -1,0 +1,54 @@
+import { describe, expect, it } from 'vitest'
+
+import { calculateTenure, fullName, initials, isSalaryReviewOverdue } from '@/features/people/domain/person.rules'
+
+describe('fullName / initials', () => {
+  it('combina nombre y apellidos', () => {
+    expect(fullName({ firstName: 'Laura', lastName: 'Martín' })).toBe('Laura Martín')
+  })
+
+  it('calcula iniciales en mayúsculas', () => {
+    expect(initials({ firstName: 'Laura', lastName: 'Martín' })).toBe('LM')
+  })
+})
+
+describe('calculateTenure', () => {
+  it('devuelve solo meses cuando hay menos de un año', () => {
+    expect(calculateTenure('2026-01-15', new Date('2026-07-15'))).toBe('6m')
+  })
+
+  it('devuelve años y meses combinados', () => {
+    expect(calculateTenure('2023-01-01', new Date('2026-07-22'))).toBe('3a 6m')
+  })
+
+  it('devuelve solo años cuando el mes coincide exactamente', () => {
+    expect(calculateTenure('2024-07-22', new Date('2026-07-22'))).toBe('2a')
+  })
+
+  it('usa la fecha de baja en vez de la fecha de referencia si existe', () => {
+    expect(calculateTenure('2023-01-01', new Date('2026-07-22'), '2024-01-01')).toBe('1a')
+  })
+
+  it('no da antigüedad negativa si aún no se ha cumplido el día del mes', () => {
+    expect(calculateTenure('2026-07-20', new Date('2026-07-22'))).toBe('0m')
+  })
+})
+
+describe('isSalaryReviewOverdue', () => {
+  it('es true cuando han pasado más meses que el umbral', () => {
+    expect(isSalaryReviewOverdue('2024-01-01', new Date('2026-07-22'), 18)).toBe(true)
+  })
+
+  it('es false cuando no ha pasado el umbral', () => {
+    expect(isSalaryReviewOverdue('2025-06-01', new Date('2026-07-22'), 18)).toBe(false)
+  })
+
+  it('usa 18 meses como umbral por defecto', () => {
+    expect(isSalaryReviewOverdue('2025-06-01', new Date('2026-07-22'))).toBe(false)
+    expect(isSalaryReviewOverdue('2024-01-01', new Date('2026-07-22'))).toBe(true)
+  })
+
+  it('considera vencido justo al alcanzar el umbral (inclusive)', () => {
+    expect(isSalaryReviewOverdue('2025-01-22', new Date('2026-07-22'), 18)).toBe(true)
+  })
+})
