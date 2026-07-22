@@ -48,6 +48,33 @@ describe.skipIf(!connectionString)('RLS de people/salary_records (integración)'
     await adminClient.end()
   })
 
+  it('un usuario puede leer su propia fila de memberships sin recursión (regresión)', async () => {
+    // Bug real de producción: memberships_select consultaba memberships dentro de su propia
+    // política, provocando "infinite recursion" en cada carga de página autenticada
+    // (requireCurrentSession hace exactamente esta consulta) y un bucle /hoy ⇄ /login.
+    const adminUserId = await createUser('admin-membership-check')
+    const orgId = await asUser(adminUserId, async () => {
+      const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org Membership Check'])
+      return rows[0].id
+    })
+
+    const ownRow = await asUser(adminUserId, async () => {
+      const { rows } = await client.query('select role, organization_id from memberships where user_id = $1', [
+        adminUserId,
+      ])
+      return rows
+    })
+    expect(ownRow).toHaveLength(1)
+    expect(ownRow[0].organization_id).toBe(orgId)
+
+    const otherUserId = await createUser('unrelated-membership-check')
+    const otherVisible = await asUser(otherUserId, async () => {
+      const { rows } = await client.query('select id from memberships where user_id = $1', [adminUserId])
+      return rows
+    })
+    expect(otherVisible).toHaveLength(0)
+  })
+
   it('aísla los datos de dos organizaciones distintas', async () => {
     const adminAUserId = await createUser('admin-a')
     const adminBUserId = await createUser('admin-b')
