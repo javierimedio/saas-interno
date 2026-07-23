@@ -11,6 +11,7 @@ export const CANONICAL_FIELDS = [
   'hireDate',
   'contractType',
   'birthDate',
+  'employeeCode',
   'grossAnnualSalary',
   'currency',
 ] as const
@@ -27,6 +28,7 @@ const HEADER_ALIASES: Record<CanonicalField, string[]> = {
   hireDate: ['fecha alta', 'fecha de alta', 'hire date', 'fecha incorporacion', 'fecha incorporación', 'fecha de incorporacion'],
   contractType: ['tipo contrato', 'tipo de contrato', 'contrato', 'contract type'],
   birthDate: ['fecha nacimiento', 'fecha de nacimiento', 'birth date'],
+  employeeCode: ['codigo empleado', 'código empleado', 'codigo de empleado', 'código de empleado', 'employee code', 'codigo', 'código'],
   grossAnnualSalary: ['salario', 'salario bruto', 'salario bruto anual', 'salary', 'salario anual'],
   currency: ['moneda', 'currency'],
 }
@@ -106,6 +108,7 @@ export type ParsedImportRow = {
   hireDate: string | null
   contractType: (typeof CONTRACT_TYPE)[number] | null
   birthDate: string | null
+  employeeCode: string | null
   grossAnnualSalary: number | null
   currency: string
   errors: string[]
@@ -152,6 +155,8 @@ export function validateImportRow(
   const birthDateRaw = cell(raw, mapping.birthDate)
   const birthDate = birthDateRaw ? parseImportDate(birthDateRaw) : null
 
+  const employeeCode = textCell(raw, mapping.employeeCode) || null
+
   const contractTypeRaw = textCell(raw, mapping.contractType)
   const contractType = contractTypeRaw ? parseContractType(contractTypeRaw) : 'indefinido'
   if (contractTypeRaw && !contractType) errors.push(`Tipo de contrato desconocido: "${contractTypeRaw}"`)
@@ -172,6 +177,7 @@ export function validateImportRow(
     hireDate,
     contractType: contractType ?? 'indefinido',
     birthDate,
+    employeeCode,
     grossAnnualSalary,
     currency,
     errors,

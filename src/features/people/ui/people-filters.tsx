@@ -45,7 +45,7 @@ export function PeopleFilters({ departments }: { departments: DepartmentRow[] })
         <Input
           value={q}
           onChange={(event) => setQ(event.target.value)}
-          placeholder="Buscar por nombre, email o puesto…"
+          placeholder="Buscar por nombre, email, puesto o código…"
           className="pl-8"
           aria-label="Buscar personas"
         />

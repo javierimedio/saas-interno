@@ -39,6 +39,8 @@ export function PersonCreateForm({
       email: '',
       phone: '',
       positionTitle: '',
+      employeeCode: '',
+      birthDate: '',
       hireDate: new Date().toISOString().slice(0, 10),
       contractType: 'indefinido',
       currency: 'EUR',
@@ -133,6 +135,35 @@ export function PersonCreateForm({
             </FormItem>
           )}
         />
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="employeeCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Código de empleado</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="birthDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fecha de nacimiento</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} value={field.value ?? ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <FormField

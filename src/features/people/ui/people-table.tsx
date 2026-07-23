@@ -33,6 +33,7 @@ export function PeopleTable({
       <TableHeader>
         <TableRow>
           <TableHead>Persona</TableHead>
+          <TableHead>Código</TableHead>
           <TableHead>Puesto</TableHead>
           <TableHead>Departamento</TableHead>
           <TableHead>Responsable</TableHead>
@@ -54,6 +55,7 @@ export function PeopleTable({
                   {name}
                 </Link>
               </TableCell>
+              <TableCell className="text-muted-foreground">{person.employee_code ?? '—'}</TableCell>
               <TableCell className="text-muted-foreground">{person.position_title}</TableCell>
               <TableCell className="text-muted-foreground">{department?.name ?? '—'}</TableCell>
               <TableCell className="text-muted-foreground">{managerName ?? '—'}</TableCell>

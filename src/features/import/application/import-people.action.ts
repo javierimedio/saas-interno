@@ -61,11 +61,9 @@ export async function importPeopleAction(rows: ParsedImportRow[]): Promise<Resul
           hireDate: row.hireDate as string,
           grossAnnualSalary: row.grossAnnualSalary as number,
           currency: row.currency,
+          employeeCode: row.employeeCode || undefined,
+          birthDate: row.birthDate || undefined,
         })
-
-        if (row.birthDate) {
-          await supabase.from('people').update({ birth_date: row.birthDate }).eq('id', person.id)
-        }
 
         createdRows.push({ row, personId: person.id })
       } catch (error) {
@@ -100,6 +98,8 @@ export async function importPeopleAction(rows: ParsedImportRow[]): Promise<Resul
             managerId: manager.id,
             contractType: person.contract_type,
             hireDate: person.hire_date,
+            employeeCode: person.employee_code ?? undefined,
+            birthDate: person.birth_date ?? undefined,
           })
         } catch {
           // El enlace de manager es un "nice to have": si falla, la persona queda creada sin manager.

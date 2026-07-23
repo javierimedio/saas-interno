@@ -122,6 +122,7 @@ export interface Database {
           employment_status: Database['public']['Enums']['employment_status']
           contract_type: Database['public']['Enums']['contract_type']
           birth_date: string | null
+          employee_code: string | null
           created_at: string
           updated_at: string
         }
@@ -142,6 +143,7 @@ export interface Database {
           employment_status?: Database['public']['Enums']['employment_status']
           contract_type: Database['public']['Enums']['contract_type']
           birth_date?: string | null
+          employee_code?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -162,6 +164,7 @@ export interface Database {
           employment_status?: Database['public']['Enums']['employment_status']
           contract_type?: Database['public']['Enums']['contract_type']
           birth_date?: string | null
+          employee_code?: string | null
           created_at?: string
           updated_at?: string
         }

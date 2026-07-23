@@ -93,6 +93,27 @@ describe('validateImportRow', () => {
     expect(row.contractType).toBe('indefinido')
   })
 
+  it('reconoce el código de empleado y la fecha de nacimiento cuando existen', () => {
+    const mapping = mapHeaders(['Nombre', 'Apellidos', 'Email', 'Puesto', 'Fecha de Alta', 'Salario', 'Código empleado', 'Fecha de nacimiento'])
+    const row = validateImportRow(
+      0,
+      {
+        Nombre: 'Ana',
+        Apellidos: 'García',
+        Email: 'ana@empresa.com',
+        Puesto: 'Growth Marketer',
+        'Fecha de Alta': '2024-06-01',
+        Salario: '30000',
+        'Código empleado': 'EMP-042',
+        'Fecha de nacimiento': '1990-05-10',
+      },
+      mapping,
+    )
+    expect(row.errors).toEqual([])
+    expect(row.employeeCode).toBe('EMP-042')
+    expect(row.birthDate).toBe('1990-05-10')
+  })
+
   it('acumula errores por cada campo obligatorio ausente', () => {
     const mapping = mapHeaders(['Nombre'])
     const row = validateImportRow(0, { Nombre: '' }, mapping)

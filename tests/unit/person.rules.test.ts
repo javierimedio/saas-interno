@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { calculateTenure, fullName, initials, isSalaryReviewOverdue } from '@/features/people/domain/person.rules'
+import { calculateAge, calculateTenure, fullName, initials, isSalaryReviewOverdue } from '@/features/people/domain/person.rules'
 
 describe('fullName / initials', () => {
   it('combina nombre y apellidos', () => {
@@ -50,5 +50,19 @@ describe('isSalaryReviewOverdue', () => {
 
   it('considera vencido justo al alcanzar el umbral (inclusive)', () => {
     expect(isSalaryReviewOverdue('2025-01-22', new Date('2026-07-22'), 18)).toBe(true)
+  })
+})
+
+describe('calculateAge', () => {
+  it('calcula la edad cuando ya se ha cumplido años este año', () => {
+    expect(calculateAge('1990-01-15', new Date('2026-07-22'))).toBe(36)
+  })
+
+  it('no suma el año todavía si el cumpleaños no ha llegado', () => {
+    expect(calculateAge('1990-12-25', new Date('2026-07-22'))).toBe(35)
+  })
+
+  it('suma el año exactamente el día del cumpleaños', () => {
+    expect(calculateAge('1990-07-22', new Date('2026-07-22'))).toBe(36)
   })
 })

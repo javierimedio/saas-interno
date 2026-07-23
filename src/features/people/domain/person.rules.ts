@@ -51,3 +51,14 @@ export function isSalaryReviewOverdue(
 export function isPersonActive(employmentStatus: string): boolean {
   return employmentStatus === 'active'
 }
+
+/** Edad en años cumplidos a partir de la fecha de nacimiento. Nunca se almacena, se calcula al vuelo. */
+export function calculateAge(birthDate: string, referenceDate: Date): number {
+  const birth = new Date(`${birthDate}T00:00:00`)
+  let age = referenceDate.getFullYear() - birth.getFullYear()
+  const hasHadBirthdayThisYear =
+    referenceDate.getMonth() > birth.getMonth() ||
+    (referenceDate.getMonth() === birth.getMonth() && referenceDate.getDate() >= birth.getDate())
+  if (!hasHadBirthdayThisYear) age -= 1
+  return age
+}

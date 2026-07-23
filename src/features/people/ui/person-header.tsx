@@ -4,7 +4,7 @@ import { Pencil } from 'lucide-react'
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { fullName, calculateTenure } from '../domain/person.rules'
+import { fullName, calculateTenure, calculateAge } from '../domain/person.rules'
 import { CONTRACT_TYPE_LABELS } from '../domain/person.schema'
 import { EmploymentStatusBadge } from './employment-status-badge'
 import { OffboardDialog } from './offboard-dialog'
@@ -72,6 +72,7 @@ export function PersonHeader({
       </div>
 
       <div className="grid grid-cols-2 gap-4 border-t border-border px-6 py-4 sm:grid-cols-4">
+        <Field label="Código de empleado" value={person.employee_code ?? '—'} />
         <Field label="Fecha incorporación" value={new Date(person.hire_date).toLocaleDateString('es-ES')} />
         <Field label="Antigüedad" value={calculateTenure(person.hire_date, now, person.termination_date)} />
         <Field
@@ -79,6 +80,14 @@ export function PersonHeader({
           value={latestSalary ? formatCurrency(Number(latestSalary.gross_annual_salary), latestSalary.currency) : '—'}
         />
         <Field label="Email" value={person.email} />
+        <Field
+          label="Fecha de nacimiento"
+          value={
+            person.birth_date
+              ? `${new Date(person.birth_date).toLocaleDateString('es-ES')} (${calculateAge(person.birth_date, now)} años)`
+              : '—'
+          }
+        />
       </div>
     </div>
   )

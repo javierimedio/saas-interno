@@ -43,6 +43,8 @@ const basePersonFields = {
   departmentId: uuid.optional(),
   managerId: uuid.optional(),
   contractType: z.enum(CONTRACT_TYPE, { message: 'Selecciona un tipo de contrato' }),
+  employeeCode: z.string().trim().max(50).optional(),
+  birthDate: z.string().optional(),
 }
 
 export const createPersonSchema = z.object({

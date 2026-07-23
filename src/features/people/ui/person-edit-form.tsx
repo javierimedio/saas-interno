@@ -38,6 +38,8 @@ export function PersonEditForm({
       email: person.email,
       phone: person.phone ?? '',
       positionTitle: person.position_title,
+      employeeCode: person.employee_code ?? '',
+      birthDate: person.birth_date ?? '',
       departmentId: person.department_id ?? undefined,
       managerId: person.manager_id ?? undefined,
       hireDate: person.hire_date,
@@ -133,6 +135,35 @@ export function PersonEditForm({
             </FormItem>
           )}
         />
+
+        <div className="grid grid-cols-2 gap-4">
+          <FormField
+            control={form.control}
+            name="employeeCode"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Código de empleado</FormLabel>
+                <FormControl>
+                  <Input {...field} value={field.value ?? ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="birthDate"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Fecha de nacimiento</FormLabel>
+                <FormControl>
+                  <Input type="date" {...field} value={field.value ?? ''} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <FormField

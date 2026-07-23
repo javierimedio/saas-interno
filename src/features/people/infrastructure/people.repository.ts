@@ -34,7 +34,7 @@ export async function listPeople(
   if (filters.q) {
     const term = filters.q.replace(/[%_]/g, '')
     query = query.or(
-      `first_name.ilike.%${term}%,last_name.ilike.%${term}%,email.ilike.%${term}%,position_title.ilike.%${term}%`,
+      `first_name.ilike.%${term}%,last_name.ilike.%${term}%,email.ilike.%${term}%,position_title.ilike.%${term}%,employee_code.ilike.%${term}%`,
     )
   }
 
@@ -65,7 +65,9 @@ export async function getPersonById(client: TypedClient, id: string): Promise<Pe
   return data
 }
 
-/** Alta atómica vía la función de Postgres create_person_with_initial_salary (docs/03-modelo-datos.md §3.4). */
+/** Alta atómica vía la función de Postgres create_person_with_initial_salary (docs/03-modelo-datos.md §3.4).
+ * employee_code/birth_date no forman parte de la firma de esa función (no se ha tocado el
+ * esquema): se completan con un update inmediato tras el alta, igual que hace la importación. */
 export async function createPersonWithInitialSalary(
   client: TypedClient,
   organizationId: string,
@@ -90,6 +92,23 @@ export async function createPersonWithInitialSalary(
     throw new Error(`No se pudo dar de alta a la persona: ${error.message}`)
   }
 
+  if (input.employeeCode || input.birthDate) {
+    const { data: updated, error: updateError } = await client
+      .from('people')
+      .update({
+        employee_code: input.employeeCode || null,
+        birth_date: input.birthDate || null,
+      })
+      .eq('id', data.id)
+      .select('*')
+      .single()
+
+    if (updateError) {
+      throw new Error(`Persona creada, pero no se pudo guardar el código de empleado/fecha de nacimiento: ${updateError.message}`)
+    }
+    return updated
+  }
+
   return data
 }
 
@@ -106,6 +125,8 @@ export async function updatePerson(client: TypedClient, input: UpdatePersonInput
       manager_id: input.managerId ?? null,
       hire_date: input.hireDate,
       contract_type: input.contractType,
+      employee_code: input.employeeCode || null,
+      birth_date: input.birthDate || null,
     })
     .eq('id', input.id)
     .select('*')
