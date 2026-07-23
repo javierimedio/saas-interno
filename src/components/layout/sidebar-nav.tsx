@@ -27,7 +27,7 @@ const NAV_ITEMS = [
   { href: '/actions', label: 'Acciones', icon: CheckSquare, enabled: true },
   { href: '/development', label: 'Desarrollo', icon: TrendingUp, enabled: true },
   { href: '/calendar', label: 'Calendario', icon: CalendarDays, enabled: true },
-  { href: '/reports', label: 'Informes', icon: FileText, enabled: false },
+  { href: '/reports', label: 'Informes', icon: FileText, enabled: true },
 ] as const
 
 export function SidebarNav() {

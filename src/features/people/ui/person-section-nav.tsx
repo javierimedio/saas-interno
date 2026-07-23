@@ -12,6 +12,7 @@ const SECTIONS = [
   { id: 'compensacion', label: 'Compensación' },
   { id: 'documentos', label: 'Documentos' },
   { id: 'notas', label: 'Notas' },
+  { id: 'informes', label: 'Informes' },
 ] as const
 
 /**

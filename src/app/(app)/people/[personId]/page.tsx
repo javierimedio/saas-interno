@@ -28,6 +28,9 @@ import { listTrainingsByPerson } from '@/features/development/infrastructure/tra
 import { listCareerPlansByPerson, listMilestones } from '@/features/development/infrastructure/career-plans.repository'
 import { listFeedbackByPerson, listEvaluationsByPerson } from '@/features/development/infrastructure/feedback-evaluations.repository'
 import { PersonDevelopmentSection } from '@/features/development/ui/person-development-section'
+import { listReportsByPerson } from '@/features/reports/infrastructure/reports.repository'
+import { ReportsList } from '@/features/reports/ui/reports-list'
+import { CreateReportDialog } from '@/features/reports/ui/create-report-dialog'
 
 export default async function PersonProfilePage({ params }: { params: Promise<{ personId: string }> }) {
   const { personId } = await params
@@ -54,6 +57,7 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
     careerPlans,
     feedback,
     evaluations,
+    reports,
   ] = await Promise.all([
     listDepartments(supabase, person.organization_id),
     listSalaryRecords(supabase, person.id),
@@ -70,6 +74,7 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
     listCareerPlansByPerson(supabase, person.id),
     listFeedbackByPerson(supabase, person.id),
     listEvaluationsByPerson(supabase, person.id),
+    listReportsByPerson(supabase, person.id),
   ])
 
   const goalCheckins = await listCheckinsForGoals(supabase, goals.map((g) => g.id))
@@ -200,6 +205,18 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
           </CardHeader>
           <CardContent>
             <PrivateNotesPanel personId={person.id} notes={privateNotes} />
+          </CardContent>
+        </Card>
+      </section>
+
+      <section id="informes" className="scroll-mt-16">
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between">
+            <CardTitle>Informes</CardTitle>
+            <CreateReportDialog people={people} defaultPersonId={person.id} />
+          </CardHeader>
+          <CardContent>
+            <ReportsList reports={reports} />
           </CardContent>
         </Card>
       </section>

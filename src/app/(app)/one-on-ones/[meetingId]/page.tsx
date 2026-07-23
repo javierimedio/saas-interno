@@ -16,6 +16,7 @@ import { AgendaList } from '@/features/one-on-ones/ui/agenda-list'
 import { AgreementsList } from '@/features/one-on-ones/ui/agreements-list'
 import { MeetingActionsPanel } from '@/features/one-on-ones/ui/meeting-actions-panel'
 import { MEETING_MODE_LABELS } from '@/features/one-on-ones/domain/one-on-one.schema'
+import { GenerateOneOnOneReportButton } from '@/features/reports/ui/generate-one-on-one-report-button'
 
 export default async function MeetingPage({ params }: { params: Promise<{ meetingId: string }> }) {
   const { meetingId } = await params
@@ -103,8 +104,9 @@ export default async function MeetingPage({ params }: { params: Promise<{ meetin
 
       {meeting.status === 'completed' ? (
         <Card>
-          <CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Cierre</CardTitle>
+            <GenerateOneOnOneReportButton oneOnOneId={meeting.id} />
           </CardHeader>
           <CardContent className="flex flex-col gap-3">
             {meeting.manager_comments ? <p className="text-sm">{meeting.manager_comments}</p> : null}
