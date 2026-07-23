@@ -9,6 +9,7 @@ import {
   LayoutGrid,
   Settings,
   TrendingUp,
+  Upload,
   Users,
   Video,
 } from 'lucide-react'
@@ -28,6 +29,7 @@ const NAV_ITEMS = [
   { href: '/development', label: 'Desarrollo', icon: TrendingUp, enabled: true },
   { href: '/calendar', label: 'Calendario', icon: CalendarDays, enabled: true },
   { href: '/reports', label: 'Informes', icon: FileText, enabled: true },
+  { href: '/import', label: 'Importar', icon: Upload, enabled: true },
 ] as const
 
 export function SidebarNav() {
