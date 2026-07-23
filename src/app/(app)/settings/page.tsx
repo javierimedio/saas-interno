@@ -24,7 +24,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
-      <h1 className="text-lg font-semibold">Configuración</h1>
+      <h1 className="text-nexo-title">Configuración</h1>
 
       <Card>
         <CardHeader>

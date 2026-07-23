@@ -1,22 +1,30 @@
 import type { Metadata } from 'next'
+import { Inter } from 'next/font/google'
 
 import { Toaster } from '@/components/ui/sonner'
+import { ThemeProvider } from '@/components/layout/theme-provider'
+import { BRAND } from '@/lib/brand'
 import './globals.css'
 
-// docs/product-design/05-design-system.md §5.1: stack de fuentes del sistema, sin fuente
-// web incrustada — prioriza velocidad de carga sobre personalidad tipográfica.
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'Nexo',
-  description: 'Gestión de personas y One2One',
+  title: 'Nexo · GOR FACTORY',
+  description: 'Gestión de personas y One2One — GOR FACTORY',
+  icons: {
+    icon: BRAND.logoWhiteUrl,
+    shortcut: BRAND.logoWhiteUrl,
+  },
 }
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="es" className="h-full antialiased">
+    <html lang="es" className={`h-full antialiased ${inter.variable}`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col font-sans">
-        {children}
-        <Toaster position="top-right" />
+        <ThemeProvider>
+          {children}
+          <Toaster position="top-right" />
+        </ThemeProvider>
       </body>
     </html>
   )

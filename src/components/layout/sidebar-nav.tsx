@@ -52,9 +52,12 @@ export function SidebarNav({
 
   return (
     <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-card px-3 py-4">
-      <div className="flex items-center gap-2 px-2 pb-4 text-sm font-semibold">
-        <span className="h-2 w-2 rounded-sm bg-primary" aria-hidden />
-        Nexo
+      <div className="px-2 pb-4">
+        <div className="flex items-center gap-2 text-nexo-title">
+          <span className="h-2 w-2 rounded-sm bg-primary" aria-hidden />
+          Nexo
+        </div>
+        <p className="mt-0.5 text-[10px] font-medium tracking-wide text-text-faint uppercase">Ecosistema GOR FACTORY</p>
       </div>
       <nav className="flex flex-col gap-0.5" aria-label="Navegación principal">
         {navItems.map((item) => {

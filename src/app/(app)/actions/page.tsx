@@ -34,7 +34,7 @@ export default async function ActionsPage({
     <div className="flex flex-col gap-5 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Acciones</h1>
+          <h1 className="text-nexo-title">Acciones</h1>
           <p className="text-sm text-muted-foreground">{actions.length} acciones</p>
         </div>
         <CreateActionDialog people={people} />

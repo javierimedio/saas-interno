@@ -45,7 +45,7 @@ export default async function OneOnOnesPage({
     <div className="flex flex-col gap-5 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">One2One</h1>
+          <h1 className="text-nexo-title">One2One</h1>
           <p className="text-sm text-muted-foreground">{total} reuniones</p>
         </div>
         <Button asChild>

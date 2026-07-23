@@ -16,7 +16,7 @@ export default async function NewPersonPage() {
   return (
     <div className="flex flex-col gap-5 p-6">
       <div>
-        <h1 className="text-lg font-semibold">Nueva persona</h1>
+        <h1 className="text-nexo-title">Nueva persona</h1>
         <p className="text-sm text-muted-foreground">
           El alta registra también su salario inicial — no se puede guardar sin él.
         </p>

@@ -35,7 +35,7 @@ export default async function DevelopmentPage({
   return (
     <div className="flex flex-col gap-5 p-6">
       <div>
-        <h1 className="text-lg font-semibold">Desarrollo</h1>
+        <h1 className="text-nexo-title">Desarrollo</h1>
         <p className="text-sm text-muted-foreground">Objetivos, competencias, formación y trayectoria del equipo</p>
       </div>
       <DevelopmentTabs active={tab} />

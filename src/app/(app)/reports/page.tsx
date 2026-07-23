@@ -20,7 +20,7 @@ export default async function ReportsPage() {
     <div className="flex flex-col gap-5 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Informes</h1>
+          <h1 className="text-nexo-title">Informes</h1>
           <p className="text-sm text-muted-foreground">{reports.length} informes generados</p>
         </div>
         <CreateReportDialog people={people} />

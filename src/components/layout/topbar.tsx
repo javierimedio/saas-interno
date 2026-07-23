@@ -10,12 +10,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { signOutAction } from '@/features/auth/application/sign-in.action'
+import { ThemeToggle } from './theme-toggle'
 
 export function Topbar({ organizationName, email }: { organizationName: string; email: string }) {
   return (
     <header className="flex h-14 shrink-0 items-center gap-3 border-b border-border bg-card px-5">
-      <span className="text-sm font-medium text-muted-foreground">{organizationName}</span>
-      <div className="ml-auto flex items-center gap-3">
+      <span className="text-nexo-subtitle text-[13px]">{organizationName}</span>
+      <div className="ml-auto flex items-center gap-2">
+        <ThemeToggle />
         <DropdownMenu>
           <DropdownMenuTrigger className="rounded-full outline-none focus-visible:ring-2 focus-visible:ring-ring">
             <Avatar name={email} size="sm" />

@@ -65,7 +65,12 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-5 p-6">
-      <h1 className="text-lg font-semibold">Dashboard</h1>
+      <div>
+        <h1 className="text-nexo-title">Dashboard</h1>
+        <p className="text-nexo-subtitle mt-0.5 text-[13px]">
+          {now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
+        </p>
+      </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
         <StatCard label="Personas activas" value={String(activePeople.length)} />
@@ -91,18 +96,21 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>One2One</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex flex-col gap-4 pt-0">
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-faint">Próximos</p>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-text-faint">Próximos</p>
               {upcomingMeetings.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin reuniones programadas.</p>
+                <p className="py-2 text-sm text-muted-foreground">Sin reuniones programadas.</p>
               ) : (
-                <ul className="flex flex-col gap-1.5">
+                <ul className="divide-y divide-border">
                   {upcomingMeetings.map((m) => (
                     <li key={m.id}>
-                      <Link href={`/one-on-ones/${m.id}`} className="flex items-center justify-between text-sm hover:underline">
+                      <Link
+                        href={`/one-on-ones/${m.id}`}
+                        className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
+                      >
                         <span>{namesById.get(m.person_id) ?? '—'}</span>
-                        <span className="text-text-faint">
+                        <span className="tabular-nums text-text-faint">
                           {new Date(m.scheduled_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                         </span>
                       </Link>
@@ -113,12 +121,16 @@ export default async function DashboardPage() {
             </div>
             {overdueMeetings.length > 0 ? (
               <div>
-                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-destructive">Retrasados</p>
-                <ul className="flex flex-col gap-1.5">
+                <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-destructive">Retrasados</p>
+                <ul className="divide-y divide-border">
                   {overdueMeetings.map((m) => (
                     <li key={m.id}>
-                      <Link href={`/one-on-ones/${m.id}`} className="text-sm text-destructive hover:underline">
-                        {namesById.get(m.person_id) ?? '—'} · {new Date(m.scheduled_at).toLocaleDateString('es-ES')}
+                      <Link
+                        href={`/one-on-ones/${m.id}`}
+                        className="flex items-center justify-between gap-2 py-1.5 text-sm text-destructive transition-colors hover:bg-destructive/5"
+                      >
+                        <span>{namesById.get(m.person_id) ?? '—'}</span>
+                        <span className="tabular-nums">{new Date(m.scheduled_at).toLocaleDateString('es-ES')}</span>
                       </Link>
                     </li>
                   ))}
@@ -126,16 +138,19 @@ export default async function DashboardPage() {
               </div>
             ) : null}
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-text-faint">Últimos realizados</p>
+              <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-text-faint">Últimos realizados</p>
               {recentMeetings.length === 0 ? (
-                <p className="text-sm text-muted-foreground">Sin reuniones completadas todavía.</p>
+                <p className="py-2 text-sm text-muted-foreground">Sin reuniones completadas todavía.</p>
               ) : (
-                <ul className="flex flex-col gap-1.5">
+                <ul className="divide-y divide-border">
                   {recentMeetings.map((m) => (
                     <li key={m.id}>
-                      <Link href={`/one-on-ones/${m.id}`} className="flex items-center justify-between text-sm hover:underline">
+                      <Link
+                        href={`/one-on-ones/${m.id}`}
+                        className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
+                      >
                         <span>{namesById.get(m.person_id) ?? '—'}</span>
-                        <span className="text-text-faint">
+                        <span className="tabular-nums text-text-faint">
                           {new Date(m.scheduled_at).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}
                           {m.overall_rating ? ` · ${m.overall_rating}/5` : ''}
                         </span>
@@ -152,7 +167,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Acciones</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex flex-col gap-4 pt-0">
             <ActionsGroup title="Vencidas" tone="bad" actions={overdueActions} namesById={namesById} />
             <ActionsGroup title="Hoy" tone="warn" actions={todayActions} namesById={namesById} />
             <ActionsGroup title="Esta semana" tone="default" actions={weekActions} namesById={namesById} />
@@ -163,19 +178,17 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Próximos cumpleaños</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {birthdays.length === 0 ? (
               <EmptyState title="Sin cumpleaños en los próximos 30 días" />
             ) : (
-              <ul className="flex flex-col gap-1.5">
+              <ul className="divide-y divide-border">
                 {birthdays.map((b) => (
-                  <li key={b.person.id} className="flex items-center justify-between text-sm">
+                  <li key={b.person.id} className="flex items-center justify-between gap-2 py-1.5 text-sm">
                     <span>
                       🎂 {b.person.first_name} {b.person.last_name}
                     </span>
-                    <span className="text-text-faint">
-                      {b.daysUntil === 0 ? 'Hoy' : `en ${b.daysUntil} días`}
-                    </span>
+                    <span className="tabular-nums text-text-faint">{b.daysUntil === 0 ? 'Hoy' : `en ${b.daysUntil} días`}</span>
                   </li>
                 ))}
               </ul>
@@ -187,14 +200,17 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Revisiones salariales</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {salaryReviews.length === 0 ? (
               <EmptyState title="Sin revisiones pendientes próximamente" />
             ) : (
-              <ul className="flex flex-col gap-1.5">
+              <ul className="divide-y divide-border">
                 {salaryReviews.map((r) => (
                   <li key={r.person.id}>
-                    <Link href={`/people/${r.person.id}`} className="flex items-center justify-between text-sm hover:underline">
+                    <Link
+                      href={`/people/${r.person.id}`}
+                      className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
+                    >
                       <span>
                         {r.person.first_name} {r.person.last_name}
                       </span>
@@ -211,18 +227,21 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Altas recientes</CardTitle>
           </CardHeader>
-          <CardContent>
+          <CardContent className="pt-0">
             {recentHiresList.length === 0 ? (
               <EmptyState title="Sin altas en los últimos 30 días" />
             ) : (
-              <ul className="flex flex-col gap-1.5">
+              <ul className="divide-y divide-border">
                 {recentHiresList.map((p) => (
                   <li key={p.id}>
-                    <Link href={`/people/${p.id}`} className="flex items-center justify-between text-sm hover:underline">
+                    <Link
+                      href={`/people/${p.id}`}
+                      className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
+                    >
                       <span>
                         {p.first_name} {p.last_name} · {p.position_title}
                       </span>
-                      <span className="text-text-faint">{new Date(p.hire_date).toLocaleDateString('es-ES')}</span>
+                      <span className="tabular-nums text-text-faint">{new Date(p.hire_date).toLocaleDateString('es-ES')}</span>
                     </Link>
                   </li>
                 ))}
@@ -250,16 +269,19 @@ function ActionsGroup({
 
   return (
     <div>
-      <p className={`mb-2 text-xs font-semibold uppercase tracking-wide ${toneClass}`}>
+      <p className={`mb-1 text-[10px] font-semibold uppercase tracking-wide ${toneClass}`}>
         {title} ({actions.length})
       </p>
       {actions.length === 0 ? (
-        <p className="text-sm text-muted-foreground">Ninguna.</p>
+        <p className="py-2 text-sm text-muted-foreground">Ninguna.</p>
       ) : (
-        <ul className="flex flex-col gap-1.5">
+        <ul className="divide-y divide-border">
           {actions.map((a) => (
             <li key={a.id}>
-              <Link href={`/actions/${a.id}`} className="flex items-center justify-between text-sm hover:underline">
+              <Link
+                href={`/actions/${a.id}`}
+                className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
+              >
                 <span>{a.title}</span>
                 <span className="text-text-faint">{namesById.get(a.person_id) ?? '—'}</span>
               </Link>

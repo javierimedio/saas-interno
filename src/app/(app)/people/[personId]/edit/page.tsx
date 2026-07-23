@@ -23,7 +23,7 @@ export default async function EditPersonPage({ params }: { params: Promise<{ per
 
   return (
     <div className="flex flex-col gap-5 p-6">
-      <h1 className="text-lg font-semibold">Editar persona</h1>
+      <h1 className="text-nexo-title">Editar persona</h1>
       <PersonEditForm person={person} departments={departments} managerCandidates={managerCandidates} />
     </div>
   )

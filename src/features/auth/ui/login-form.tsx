@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -23,13 +24,13 @@ export function LoginForm() {
   const [mode, setMode] = React.useState<'sign-in' | 'sign-up'>('sign-in')
 
   return (
-    <div className="flex w-full max-w-sm flex-col gap-6">
-      <div>
-        <div className="text-lg font-semibold">{mode === 'sign-in' ? 'Inicia sesión' : 'Crea tu organización'}</div>
-        <p className="mt-1 text-sm text-muted-foreground">
+    <div className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-sm">
+      <div className="mb-7">
+        <h1 className="text-nexo-title text-2xl">{mode === 'sign-in' ? 'Inicia sesión' : 'Crea tu acceso'}</h1>
+        <p className="text-nexo-subtitle mt-1.5 text-[13px]">
           {mode === 'sign-in'
-            ? 'Accede a Nexo para gestionar a tu equipo.'
-            : 'El primer registro crea tu organización y tu acceso de administrador.'}
+            ? 'Accede a Nexo con tu cuenta de GOR FACTORY.'
+            : 'Regístrate con el email que te ha dado tu administrador.'}
         </p>
       </div>
 
@@ -38,9 +39,9 @@ export function LoginForm() {
       <button
         type="button"
         onClick={() => setMode(mode === 'sign-in' ? 'sign-up' : 'sign-in')}
-        className="text-sm text-muted-foreground underline-offset-4 hover:underline"
+        className="mt-6 text-[13px] text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
       >
-        {mode === 'sign-in' ? '¿Primera vez? Crea tu organización' : '¿Ya tienes cuenta? Inicia sesión'}
+        {mode === 'sign-in' ? '¿Primer acceso? Crea tu cuenta' : '¿Ya tienes cuenta? Inicia sesión'}
       </button>
     </div>
   )
@@ -72,7 +73,7 @@ function SignInForm() {
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" autoComplete="email" {...field} />
+                <Input type="email" autoComplete="email" autoFocus {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -91,7 +92,8 @@ function SignInForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className="mt-1">
+          {isSubmitting ? <Loader2 className="animate-spin" /> : null}
           {isSubmitting ? 'Entrando…' : 'Entrar'}
         </Button>
       </form>
@@ -120,25 +122,12 @@ function SignUpForm() {
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
         <FormField
           control={form.control}
-          name="organizationName"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Nombre de tu organización</FormLabel>
-              <FormControl>
-                <Input placeholder="Marketing" {...field} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
           name="email"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Email</FormLabel>
               <FormControl>
-                <Input type="email" autoComplete="email" {...field} />
+                <Input type="email" autoComplete="email" autoFocus {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -157,8 +146,22 @@ function SignUpForm() {
             </FormItem>
           )}
         />
-        <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? 'Creando…' : 'Crear organización'}
+        <FormField
+          control={form.control}
+          name="organizationName"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Organización (solo si eres el primer acceso)</FormLabel>
+              <FormControl>
+                <Input placeholder="Marketing" {...field} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button type="submit" disabled={isSubmitting} className="mt-1">
+          {isSubmitting ? <Loader2 className="animate-spin" /> : null}
+          {isSubmitting ? 'Creando…' : 'Crear cuenta'}
         </Button>
       </form>
     </Form>

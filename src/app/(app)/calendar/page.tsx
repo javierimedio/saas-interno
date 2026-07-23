@@ -50,7 +50,7 @@ export default async function CalendarPage({
   return (
     <div className="flex flex-col gap-5 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-lg font-semibold">Calendario</h1>
+        <h1 className="text-nexo-title">Calendario</h1>
         <div className="flex gap-2">
           <CreateHolidayDialog />
           <CreateTimeOffDialog people={managerCandidates} />

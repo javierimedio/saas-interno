@@ -28,7 +28,7 @@ export default async function ActionDetailPage({ params }: { params: Promise<{ a
     <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-lg font-semibold">{action.title}</h1>
+          <h1 className="text-nexo-title">{action.title}</h1>
           <p className="text-sm text-muted-foreground">Sobre {person ? `${person.first_name} ${person.last_name}` : '—'}</p>
         </div>
         <div className="flex items-center gap-2">

@@ -51,7 +51,7 @@ export default async function PeoplePage({
     <div className="flex flex-col gap-5 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold">Personas</h1>
+          <h1 className="text-nexo-title">Personas</h1>
           <p className="text-sm text-muted-foreground">{total} personas en tu organización</p>
         </div>
         <Button asChild>
