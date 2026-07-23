@@ -117,6 +117,56 @@ export default async function DashboardPage() {
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
+            <CardTitle>Distribución del equipo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {distribution.length === 0 ? (
+              <EmptyState title="Sin personas activas todavía" />
+            ) : (
+              <DepartmentDistribution data={distribution} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Incremento salarial acumulado</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div>
+              <p className="text-[28px] leading-none font-bold tabular-nums text-foreground">
+                {formatSignedCurrency(totalSalaryIncrease)}
+              </p>
+              <p className="text-nexo-label mt-2">Respecto al salario inicial de cada persona activa</p>
+            </div>
+            {salaryIncreases.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sin variaciones registradas todavía.</p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {salaryIncreases.slice(0, 5).map((entry) => (
+                  <li key={entry.person.id}>
+                    <Link
+                      href={`/people/${entry.person.id}`}
+                      className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
+                    >
+                      <span>
+                        {entry.person.first_name} {entry.person.last_name}
+                      </span>
+                      <span className={`tabular-nums font-semibold ${entry.increase >= 0 ? 'text-success' : 'text-destructive'}`}>
+                        {formatSignedCurrency(entry.increase)}
+                      </span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
             <CardTitle>One2One</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-4">
@@ -265,54 +315,6 @@ export default async function DashboardPage() {
                         {p.first_name} {p.last_name} · {p.position_title}
                       </span>
                       <span className="tabular-nums text-text-faint">{new Date(p.hire_date).toLocaleDateString('es-ES')}</span>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Distribución del equipo</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {distribution.length === 0 ? (
-              <EmptyState title="Sin personas activas todavía" />
-            ) : (
-              <DepartmentDistribution data={distribution} />
-            )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Incremento salarial acumulado</CardTitle>
-          </CardHeader>
-          <CardContent className="flex flex-col gap-4">
-            <div>
-              <p className="text-[28px] leading-none font-bold tabular-nums text-foreground">
-                {formatSignedCurrency(totalSalaryIncrease)}
-              </p>
-              <p className="text-nexo-label mt-2">Respecto al salario inicial de cada persona activa</p>
-            </div>
-            {salaryIncreases.length === 0 ? (
-              <p className="text-sm text-muted-foreground">Sin variaciones registradas todavía.</p>
-            ) : (
-              <ul className="divide-y divide-border">
-                {salaryIncreases.slice(0, 5).map((entry) => (
-                  <li key={entry.person.id}>
-                    <Link
-                      href={`/people/${entry.person.id}`}
-                      className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
-                    >
-                      <span>
-                        {entry.person.first_name} {entry.person.last_name}
-                      </span>
-                      <span className={`tabular-nums font-semibold ${entry.increase >= 0 ? 'text-success' : 'text-destructive'}`}>
-                        {formatSignedCurrency(entry.increase)}
-                      </span>
                     </Link>
                   </li>
                 ))}

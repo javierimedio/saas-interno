@@ -18,9 +18,22 @@ export default async function SettingsPage() {
     listMemberships(supabase, session.organizationId),
   ])
 
+  const departmentNameById = new Map(departments.map((d) => [d.id, d.name]))
   const personByUserId = new Map(
-    people.filter((p) => p.user_id).map((p) => [p.user_id as string, { name: `${p.first_name} ${p.last_name}`, email: p.email }]),
+    people
+      .filter((p) => p.user_id)
+      .map((p) => [
+        p.user_id as string,
+        {
+          name: `${p.first_name} ${p.last_name}`,
+          positionTitle: p.position_title,
+          departmentName: p.department_id ? departmentNameById.get(p.department_id) : undefined,
+        },
+      ]),
   )
+  const unlinkedPeople = people
+    .filter((p) => !p.user_id)
+    .map((p) => ({ id: p.id, first_name: p.first_name, last_name: p.last_name, position_title: p.position_title }))
 
   return (
     <div className="mx-auto flex max-w-2xl flex-col gap-6 p-6">
@@ -49,7 +62,7 @@ export default async function SettingsPage() {
           <CardTitle>Miembros</CardTitle>
         </CardHeader>
         <CardContent>
-          <MembersList memberships={memberships} personByUserId={personByUserId} />
+          <MembersList memberships={memberships} personByUserId={personByUserId} unlinkedPeople={unlinkedPeople} />
         </CardContent>
       </Card>
     </div>

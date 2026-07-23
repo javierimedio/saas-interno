@@ -77,6 +77,12 @@ export const offboardPersonSchema = z.object({
 })
 export type OffboardPersonInput = z.infer<typeof offboardPersonSchema>
 
+export const linkPersonToUserSchema = z.object({
+  personId: uuid,
+  userId: z.string().uuid('Selecciona un miembro válido'),
+})
+export type LinkPersonToUserInput = z.infer<typeof linkPersonToUserSchema>
+
 export const salaryRecordSchema = z.object({
   personId: uuid,
   effectiveDate: z.string().min(1, 'La fecha de efecto es obligatoria'),

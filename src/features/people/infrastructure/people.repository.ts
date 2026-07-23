@@ -159,6 +159,41 @@ export async function offboardPerson(
   return data
 }
 
+/**
+ * Vincula una ficha existente con el usuario de una membership (Configuración → Miembros),
+ * para no depender de editar people.user_id a mano en Supabase. people.user_id no tiene una
+ * constraint unique en el esquema, así que se comprueba aquí para no dejar dos fichas
+ * apuntando al mismo usuario.
+ */
+export async function linkPersonToUser(
+  client: TypedClient,
+  organizationId: string,
+  personId: string,
+  userId: string,
+): Promise<PersonRow> {
+  const { data: existing, error: existingError } = await client
+    .from('people')
+    .select('id')
+    .eq('organization_id', organizationId)
+    .eq('user_id', userId)
+    .maybeSingle()
+
+  if (existingError) {
+    throw new Error(`No se pudo comprobar la vinculación: ${existingError.message}`)
+  }
+  if (existing && existing.id !== personId) {
+    throw new Error('Ese usuario ya tiene una ficha vinculada')
+  }
+
+  const { data, error } = await client.from('people').update({ user_id: userId }).eq('id', personId).select('*').single()
+
+  if (error) {
+    throw new Error(`No se pudo vincular la ficha: ${error.message}`)
+  }
+
+  return data
+}
+
 export async function getPeopleNamesByIds(
   client: TypedClient,
   ids: string[],

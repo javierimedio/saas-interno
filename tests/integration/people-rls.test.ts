@@ -200,6 +200,43 @@ describe.skipIf(!connectionString)('RLS de people/salary_records (integración)'
     })
   })
 
+  it('vincular una ficha (people.user_id) solo lo puede hacer un admin, y hace visible la ficha por autoservicio', async () => {
+    const adminUserId = await createUser('admin-link-person')
+    const employeeUserId = await createUser('employee-link-person')
+    const orgId = await asUser(adminUserId, async () => {
+      const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org Link Person'])
+      return rows[0].id
+    })
+
+    const person = await asUser(adminUserId, async () => {
+      const { rows } = await client.query(
+        `select * from create_person_with_initial_salary($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        [orgId, 'Marta', 'López', 'marta@test.local', null, 'Diseñadora', null, null, '2022-03-01', 'indefinido', 26000, 'EUR'],
+      )
+      return rows[0]
+    })
+    await adminClient.query(`insert into memberships (organization_id, user_id, role) values ($1, $2, 'employee')`, [
+      orgId,
+      employeeUserId,
+    ])
+
+    // Un empleado no puede vincularse una ficha a sí mismo: people_update exige ser admin.
+    const employeeAttempt = await asUser(employeeUserId, () =>
+      client.query('update people set user_id = $1 where id = $2', [employeeUserId, person.id]),
+    )
+    expect(employeeAttempt.rowCount).toBe(0)
+
+    // El admin sí puede vincularla (mismo update que hace linkPersonToUser).
+    await asUser(adminUserId, () => client.query('update people set user_id = $1 where id = $2', [employeeUserId, person.id]))
+
+    const visibleToEmployee = await asUser(employeeUserId, async () => {
+      const { rows } = await client.query('select id from people where user_id = $1', [employeeUserId])
+      return rows
+    })
+    expect(visibleToEmployee).toHaveLength(1)
+    expect(visibleToEmployee[0].id).toBe(person.id)
+  })
+
   it('un empleado solo ve su propia ficha, nunca la de otros compañeros (modelo de dos roles)', async () => {
     const adminUserId = await createUser('admin-employee-scope')
     const employeeUserId = await createUser('employee')
