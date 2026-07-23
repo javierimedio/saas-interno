@@ -1,11 +1,11 @@
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listDepartments } from '@/features/people/infrastructure/departments.repository'
 import { listManagerCandidates } from '@/features/people/infrastructure/people.repository'
 import { PersonCreateForm } from '@/features/people/ui/person-create-form'
 
 export default async function NewPersonPage() {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
 
   const [departments, managerCandidates] = await Promise.all([

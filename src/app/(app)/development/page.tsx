@@ -1,5 +1,5 @@
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listManagerCandidates } from '@/features/people/infrastructure/people.repository'
 import { listGoalsGlobal, listCheckinsForGoals } from '@/features/development/infrastructure/goals.repository'
 import { listCompetencies, listPersonCompetencies } from '@/features/development/infrastructure/competencies.repository'
@@ -24,7 +24,7 @@ export default async function DevelopmentPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
   const raw = await searchParams
   const tab = typeof raw.tab === 'string' ? raw.tab : 'objetivos'

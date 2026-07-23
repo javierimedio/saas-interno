@@ -1,10 +1,10 @@
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listManagerCandidates } from '@/features/people/infrastructure/people.repository'
 import { ScheduleMeetingForm } from '@/features/one-on-ones/ui/schedule-meeting-form'
 
 export default async function NewMeetingPage() {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
   const people = await listManagerCandidates(supabase, session.organizationId)
 

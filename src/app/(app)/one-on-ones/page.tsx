@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/shared/pagination'
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listManagerCandidates } from '@/features/people/infrastructure/people.repository'
 import { meetingListFiltersSchema } from '@/features/one-on-ones/domain/one-on-one.schema'
 import { listMeetings } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
@@ -16,7 +16,7 @@ export default async function OneOnOnesPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
 
   const rawParams = await searchParams

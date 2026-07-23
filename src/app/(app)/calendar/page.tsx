@@ -1,5 +1,5 @@
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listAllPeople, listManagerCandidates } from '@/features/people/infrastructure/people.repository'
 import { listMeetingsInRange } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
 import { getRangeForView, parseDate, parseView } from '@/features/calendar/domain/calendar.rules'
@@ -24,7 +24,7 @@ export default async function CalendarPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
   const raw = await searchParams
 

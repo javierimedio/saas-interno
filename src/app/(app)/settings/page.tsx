@@ -1,6 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listDepartments } from '@/features/people/infrastructure/departments.repository'
 import { listAllPeople } from '@/features/people/infrastructure/people.repository'
 import { listMemberships } from '@/features/organization/infrastructure/organizations.repository'
@@ -9,7 +9,7 @@ import { DepartmentsManager } from '@/features/organization/ui/departments-manag
 import { MembersList } from '@/features/organization/ui/members-list'
 
 export default async function SettingsPage() {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
 
   const [departments, people, memberships] = await Promise.all([

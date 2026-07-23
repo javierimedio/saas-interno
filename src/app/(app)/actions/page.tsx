@@ -1,5 +1,5 @@
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listManagerCandidates } from '@/features/people/infrastructure/people.repository'
 import { actionListFiltersSchema } from '@/features/actions/domain/action.schema'
 import { listActionsGlobal } from '@/features/actions/infrastructure/actions.repository'
@@ -12,7 +12,7 @@ export default async function ActionsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
   const raw = await searchParams
 

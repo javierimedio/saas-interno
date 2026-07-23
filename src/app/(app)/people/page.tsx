@@ -4,7 +4,7 @@ import { Plus } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Pagination } from '@/components/shared/pagination'
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { peopleListFiltersSchema } from '@/features/people/domain/person.schema'
 import { getPeopleNamesByIds, listPeople } from '@/features/people/infrastructure/people.repository'
 import { listDepartments } from '@/features/people/infrastructure/departments.repository'
@@ -16,7 +16,7 @@ export default async function PeoplePage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
 
   const rawParams = await searchParams

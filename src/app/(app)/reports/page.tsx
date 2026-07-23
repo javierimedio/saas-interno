@@ -1,12 +1,12 @@
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
-import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
+import { requireAdmin } from '@/shared/infrastructure/supabase/current-session'
 import { listManagerCandidates } from '@/features/people/infrastructure/people.repository'
 import { listReportsGlobal } from '@/features/reports/infrastructure/reports.repository'
 import { CreateReportDialog } from '@/features/reports/ui/create-report-dialog'
 import { ReportsList } from '@/features/reports/ui/reports-list'
 
 export default async function ReportsPage() {
-  const session = await requireCurrentSession()
+  const session = await requireAdmin()
   const supabase = await createClient()
 
   const [reports, people] = await Promise.all([

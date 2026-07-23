@@ -734,6 +734,10 @@ export interface Database {
         Args: { p_org_name: string }
         Returns: string
       }
+      link_or_bootstrap_membership: {
+        Args: { p_email: string; p_org_name: string }
+        Returns: string
+      }
       current_membership: {
         Args: { p_org: string }
         Returns: Database['public']['Enums']['membership_role'] | null

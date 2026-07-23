@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { redirect } from 'next/navigation'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
@@ -31,6 +32,9 @@ function formatCurrency(amount: number): string {
 
 export default async function DashboardPage() {
   const session = await requireCurrentSession()
+  if (session.role !== 'admin') {
+    redirect(session.personId ? `/people/${session.personId}` : '/login')
+  }
   const supabase = await createClient()
   const now = new Date()
 
