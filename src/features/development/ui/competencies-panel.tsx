@@ -1,3 +1,4 @@
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { EmptyState } from '@/components/shared/empty-state'
 import type { CompetencyRow, PersonCompetencyRow } from '../infrastructure/competencies.repository'
 
@@ -28,34 +29,30 @@ export function CompetenciesPanel({
   }
 
   return (
-    <div className="overflow-x-auto rounded-lg border border-border">
-      <table className="w-full text-sm">
-        <thead>
-          <tr className="border-b border-border bg-muted/40">
-            <th className="px-3 py-2 text-left font-medium">Persona</th>
-            {competencies.map((c) => (
-              <th key={c.id} className="px-3 py-2 text-left font-medium">
-                {c.name}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {personIds.map((personId) => (
-            <tr key={personId} className="border-b border-border last:border-0">
-              <td className="px-3 py-2 font-medium">{peopleNamesById.get(personId) ?? '—'}</td>
-              {competencies.map((c) => {
-                const cell = latestByPersonCompetency.get(`${personId}:${c.id}`)
-                return (
-                  <td key={c.id} className="px-3 py-2 tabular-nums">
-                    {cell ? `${cell.level}/5` : '—'}
-                  </td>
-                )
-              })}
-            </tr>
+    <Table>
+      <TableHeader>
+        <TableRow>
+          <TableHead>Persona</TableHead>
+          {competencies.map((c) => (
+            <TableHead key={c.id}>{c.name}</TableHead>
           ))}
-        </tbody>
-      </table>
-    </div>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {personIds.map((personId) => (
+          <TableRow key={personId}>
+            <TableCell className="font-semibold">{peopleNamesById.get(personId) ?? '—'}</TableCell>
+            {competencies.map((c) => {
+              const cell = latestByPersonCompetency.get(`${personId}:${c.id}`)
+              return (
+                <TableCell key={c.id} className="tabular-nums text-muted-foreground">
+                  {cell ? `${cell.level}/5` : '—'}
+                </TableCell>
+              )
+            })}
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
   )
 }

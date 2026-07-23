@@ -6,6 +6,7 @@ import { Upload } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { parseImportFileAction, type ImportPreview } from '../application/parse-import-file.action'
 import { importPeopleAction, type ImportSummary } from '../application/import-people.action'
 
@@ -93,39 +94,39 @@ export function ImportWizard() {
               Cancelar
             </Button>
           </div>
-          <div className="max-h-[480px] overflow-auto rounded-lg border border-border">
-            <table className="w-full text-sm">
-              <thead className="sticky top-0 bg-secondary/60">
-                <tr>
-                  <th className="px-3 py-2 text-left font-medium">Fila</th>
-                  <th className="px-3 py-2 text-left font-medium">Nombre</th>
-                  <th className="px-3 py-2 text-left font-medium">Email</th>
-                  <th className="px-3 py-2 text-left font-medium">Puesto</th>
-                  <th className="px-3 py-2 text-left font-medium">Alta</th>
-                  <th className="px-3 py-2 text-left font-medium">Estado</th>
-                </tr>
-              </thead>
-              <tbody>
+          <div className="max-h-[480px] overflow-auto rounded-md border border-border">
+            <Table>
+              <TableHeader className="sticky top-0">
+                <TableRow>
+                  <TableHead>Fila</TableHead>
+                  <TableHead>Nombre</TableHead>
+                  <TableHead>Email</TableHead>
+                  <TableHead>Puesto</TableHead>
+                  <TableHead>Alta</TableHead>
+                  <TableHead>Estado</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
                 {preview.rows.map((row) => (
-                  <tr key={row.index} className="border-t border-border">
-                    <td className="px-3 py-1.5 tabular-nums text-text-faint">{row.index + 1}</td>
-                    <td className="px-3 py-1.5">
+                  <TableRow key={row.index}>
+                    <TableCell className="tabular-nums text-text-faint">{row.index + 1}</TableCell>
+                    <TableCell>
                       {row.firstName} {row.lastName}
-                    </td>
-                    <td className="px-3 py-1.5">{row.email}</td>
-                    <td className="px-3 py-1.5">{row.positionTitle}</td>
-                    <td className="px-3 py-1.5">{row.hireDate ?? '—'}</td>
-                    <td className="px-3 py-1.5">
+                    </TableCell>
+                    <TableCell>{row.email}</TableCell>
+                    <TableCell>{row.positionTitle}</TableCell>
+                    <TableCell>{row.hireDate ?? '—'}</TableCell>
+                    <TableCell>
                       {row.errors.length === 0 ? (
                         <Badge variant="success">Válida</Badge>
                       ) : (
                         <span className="text-xs text-destructive">{row.errors.join('; ')}</span>
                       )}
-                    </td>
-                  </tr>
+                    </TableCell>
+                  </TableRow>
                 ))}
-              </tbody>
-            </table>
+              </TableBody>
+            </Table>
           </div>
         </div>
       ) : null}

@@ -23,6 +23,10 @@ import { cn } from '@/lib/utils'
  * reúne su One2One, sus acciones, su desarrollo, su compensación y sus documentos en un
  * único sitio (docs/03-modelo-datos.md §3.10: RLS ya restringe el acceso a nivel de datos,
  * este nav solo evita ofrecer enlaces a pantallas de gestión vacías o rotas).
+ *
+ * Comparte el mismo carbón de marca que la topbar (bg-brand-chrome) para leerse como una
+ * única superficie en "L", no como un panel aparte — es la pieza que "integra" el sidebar
+ * con la cabecera que pedía el rediseño.
  */
 const ADMIN_NAV_ITEMS = [
   { href: '/hoy', label: 'Dashboard', icon: LayoutGrid },
@@ -34,6 +38,28 @@ const ADMIN_NAV_ITEMS = [
   { href: '/reports', label: 'Informes', icon: FileText },
   { href: '/import', label: 'Importar', icon: Upload },
 ] as const
+
+function NavLink({ href, label, Icon, isActive }: { href: string; label: string; Icon: React.ElementType; isActive: boolean }) {
+  return (
+    <Link
+      href={href}
+      className={cn(
+        'group relative flex items-center gap-2.5 rounded-md py-2 pr-2.5 pl-3.5 text-[13px] font-semibold text-white/65 transition-colors hover:bg-white/8 hover:text-white',
+        isActive && 'bg-white/10 text-white',
+      )}
+    >
+      <span
+        className={cn(
+          'absolute top-1.5 bottom-1.5 left-0 w-[3px] rounded-full bg-warning transition-opacity',
+          isActive ? 'opacity-100' : 'opacity-0',
+        )}
+        aria-hidden
+      />
+      <Icon className="size-4 shrink-0" />
+      {label}
+    </Link>
+  )
+}
 
 export function SidebarNav({
   role,
@@ -51,46 +77,15 @@ export function SidebarNav({
       : []
 
   return (
-    <aside className="flex h-full w-56 shrink-0 flex-col border-r border-border bg-card px-3 py-4">
-      <div className="px-2 pb-4">
-        <div className="flex items-center gap-2 text-nexo-title">
-          <span className="h-2 w-2 rounded-sm bg-primary" aria-hidden />
-          Nexo
-        </div>
-        <p className="mt-0.5 text-[10px] font-medium tracking-wide text-text-faint uppercase">Ecosistema GOR FACTORY</p>
-      </div>
+    <aside className="flex h-full w-56 shrink-0 flex-col gap-0.5 bg-brand-chrome px-2.5 py-4">
       <nav className="flex flex-col gap-0.5" aria-label="Navegación principal">
-        {navItems.map((item) => {
-          const Icon = item.icon
-          const isActive = pathname.startsWith(item.href)
-
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground',
-                isActive && 'bg-accent text-accent-foreground hover:bg-accent',
-              )}
-            >
-              <Icon className="size-4" />
-              {item.label}
-            </Link>
-          )
-        })}
+        {navItems.map((item) => (
+          <NavLink key={item.href} href={item.href} label={item.label} Icon={item.icon} isActive={pathname.startsWith(item.href)} />
+        ))}
       </nav>
       {isAdmin ? (
-        <div className="mt-auto border-t border-border pt-2">
-          <Link
-            href="/settings"
-            className={cn(
-              'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground',
-              pathname.startsWith('/settings') && 'bg-accent text-accent-foreground hover:bg-accent',
-            )}
-          >
-            <Settings className="size-4" />
-            Ajustes
-          </Link>
+        <div className="mt-auto border-t border-white/10 pt-2">
+          <NavLink href="/settings" label="Ajustes" Icon={Settings} isActive={pathname.startsWith('/settings')} />
         </div>
       ) : null}
     </aside>

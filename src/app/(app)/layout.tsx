@@ -6,10 +6,10 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const session = await requireCurrentSession()
 
   return (
-    <div className="flex h-screen overflow-hidden bg-background">
-      <SidebarNav role={session.role} personId={session.personId} />
-      <div className="flex min-w-0 flex-1 flex-col">
-        <Topbar organizationName={session.organizationName} email={session.email} />
+    <div className="flex h-screen flex-col overflow-hidden bg-background">
+      <Topbar organizationName={session.organizationName} email={session.email} />
+      <div className="flex min-h-0 flex-1">
+        <SidebarNav role={session.role} personId={session.personId} />
         <main className="flex-1 overflow-y-auto">{children}</main>
       </div>
     </div>

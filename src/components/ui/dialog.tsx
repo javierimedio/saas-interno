@@ -35,7 +35,7 @@ const DialogContent = React.forwardRef<
     <DialogPrimitive.Content
       ref={ref}
       className={cn(
-        'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-lg border border-border bg-card p-6 shadow-lg',
+        'fixed left-1/2 top-1/2 z-50 grid w-full max-w-lg -translate-x-1/2 -translate-y-1/2 gap-4 rounded-md border border-border bg-card p-5 shadow-nexo',
         'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95',
         className,
       )}
@@ -52,12 +52,23 @@ const DialogContent = React.forwardRef<
 DialogContent.displayName = DialogPrimitive.Content.displayName
 
 function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return <div className={cn('flex flex-col gap-1.5 text-left', className)} {...props} />
+  return (
+    <div
+      className={cn('-mx-5 -mt-5 flex flex-col gap-1 border-b border-border px-5 pt-5 pb-4 text-left', className)}
+      {...props}
+    />
+  )
 }
 
 function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
   return (
-    <div className={cn('flex flex-col-reverse gap-2 sm:flex-row sm:justify-end', className)} {...props} />
+    <div
+      className={cn(
+        '-mx-5 -mb-5 flex flex-col-reverse gap-2 border-t border-border px-5 pt-4 pb-5 sm:flex-row sm:justify-end',
+        className,
+      )}
+      {...props}
+    />
   )
 }
 
@@ -65,7 +76,7 @@ const DialogTitle = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Title>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Title>
 >(({ className, ...props }, ref) => (
-  <DialogPrimitive.Title ref={ref} className={cn('text-base font-semibold', className)} {...props} />
+  <DialogPrimitive.Title ref={ref} className={cn('text-[15px] font-bold', className)} {...props} />
 ))
 DialogTitle.displayName = DialogPrimitive.Title.displayName
 

@@ -89,9 +89,9 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
     milestonesByPlan.set(m.career_plan_id, [...(milestonesByPlan.get(m.career_plan_id) ?? []), m])
   }
 
-  const now0 = new Date()
+  const now = new Date()
   const openActionsCount = actions.filter((a) => a.status !== 'completed' && a.status !== 'cancelled').length
-  const overdueActionsCount = actions.filter((a) => isActionOverdue(a.due_date, a.status, now0)).length
+  const overdueActionsCount = actions.filter((a) => isActionOverdue(a.due_date, a.status, now)).length
   const activeGoalsCount = goals.filter((g) => g.status !== 'completed' && g.status !== 'cancelled').length
   const atRiskGoalsCount = goals.filter((g) => g.status === 'at_risk' || g.status === 'off_track').length
 
@@ -103,7 +103,6 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
 
   const departmentName = departments.find((d) => d.id === person.department_id)?.name
   const timeline = buildPersonTimeline(auditEvents, salaryRecords, documents, meetings, actions)
-  const now = new Date()
 
   const upcoming = meetings
     .filter((m) => (m.status === 'scheduled' || m.status === 'preparing') && new Date(m.scheduled_at) >= now)
@@ -114,7 +113,13 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6 p-6">
-      <PersonHeader person={person} departmentName={departmentName} managerName={managerName} />
+      <PersonHeader
+        person={person}
+        departmentName={departmentName}
+        managerName={managerName}
+        latestSalary={salaryRecords[0]}
+        now={now}
+      />
       <PersonVitals
         hireDate={person.hire_date}
         terminationDate={person.termination_date}

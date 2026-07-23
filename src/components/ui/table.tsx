@@ -5,13 +5,13 @@ import { cn } from '@/lib/utils'
 function Table({ className, ...props }: React.ComponentProps<'table'>) {
   return (
     <div className="w-full overflow-x-auto rounded-md border border-border">
-      <table className={cn('w-full caption-bottom text-sm', className)} {...props} />
+      <table className={cn('w-full caption-bottom text-[13px]', className)} {...props} />
     </div>
   )
 }
 
 function TableHeader({ className, ...props }: React.ComponentProps<'thead'>) {
-  return <thead className={cn('bg-secondary [&_tr]:border-b', className)} {...props} />
+  return <thead className={cn('bg-muted [&_tr]:border-b', className)} {...props} />
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<'tbody'>) {
@@ -21,7 +21,7 @@ function TableBody({ className, ...props }: React.ComponentProps<'tbody'>) {
 function TableRow({ className, ...props }: React.ComponentProps<'tr'>) {
   return (
     <tr
-      className={cn('border-b border-border transition-colors hover:bg-secondary/60', className)}
+      className={cn('border-b border-border transition-colors hover:bg-row-hover', className)}
       {...props}
     />
   )
@@ -31,7 +31,7 @@ function TableHead({ className, ...props }: React.ComponentProps<'th'>) {
   return (
     <th
       className={cn(
-        'h-10 px-3 text-left align-middle text-xs font-semibold uppercase tracking-wide text-text-faint',
+        'h-10 px-3 text-left align-middle text-[11px] font-bold uppercase tracking-wide text-text-faint',
         className,
       )}
       {...props}

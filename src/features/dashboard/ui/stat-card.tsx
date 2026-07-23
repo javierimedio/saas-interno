@@ -10,17 +10,17 @@ export function StatCard({
   tone?: 'default' | 'warn' | 'bad' | 'good'
 }) {
   const toneClass = {
-    default: '',
+    default: 'text-foreground',
     warn: 'text-warning',
     bad: 'text-destructive',
     good: 'text-success',
   }[tone]
 
   return (
-    <div className="rounded-lg border border-border bg-card px-4 py-3">
-      <p className="text-[11px] font-semibold uppercase tracking-wide text-text-faint">{label}</p>
-      <p className={`text-xl font-semibold tabular-nums ${toneClass}`}>{value}</p>
-      {sub ? <p className="mt-0.5 text-xs text-muted-foreground">{sub}</p> : null}
+    <div className="rounded-md border border-border bg-card px-5 py-4 shadow-nexo">
+      <p className={`text-[28px] leading-none font-bold tabular-nums ${toneClass}`}>{value}</p>
+      <p className="text-nexo-label mt-2">{label}</p>
+      {sub ? <p className="mt-1 text-[12px] text-muted-foreground">{sub}</p> : null}
     </div>
   )
 }

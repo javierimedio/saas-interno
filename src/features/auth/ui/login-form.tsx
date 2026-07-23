@@ -24,12 +24,33 @@ export function LoginForm() {
   const [mode, setMode] = React.useState<'sign-in' | 'sign-up'>('sign-in')
 
   return (
-    <div className="w-full max-w-sm rounded-xl border border-border bg-card p-8 shadow-sm">
-      <div className="mb-7">
-        <h1 className="text-nexo-title text-2xl">{mode === 'sign-in' ? 'Inicia sesión' : 'Crea tu acceso'}</h1>
-        <p className="text-nexo-subtitle mt-1.5 text-[13px]">
+    <div
+      className="w-full rounded-xl bg-white/97 p-9 shadow-[0_8px_40px_rgba(0,0,0,0.35)]"
+      style={
+        {
+          // La portada siempre se ve igual, claro u oscuro sea el tema de la app: los
+          // inputs/botones no deben heredar los tokens de dark mode aquí.
+          '--card': '#ffffff',
+          '--foreground': '#2c2c2a',
+          '--muted-foreground': '#888780',
+          '--muted': '#f1efe8',
+          '--border': '#e0ded6',
+          '--input': '#e0ded6',
+          '--ring': '#ba7517',
+          '--primary': '#2c2c2a',
+          '--primary-foreground': '#ffffff',
+          '--destructive': '#c0392b',
+        } as React.CSSProperties
+      }
+    >
+      <div className="mb-7 text-center">
+        <p className="text-nexo-label text-[#2c2c2a]/50">Nexo</p>
+        <h1 className="mt-1 text-xl font-bold text-[#2c2c2a]">
+          {mode === 'sign-in' ? 'Inicia sesión' : 'Crea tu acceso'}
+        </h1>
+        <p className="mt-1.5 text-[13px] text-[#888780]">
           {mode === 'sign-in'
-            ? 'Accede a Nexo con tu cuenta de GOR FACTORY.'
+            ? 'Accede con tu correo corporativo de GOR FACTORY.'
             : 'Regístrate con el email que te ha dado tu administrador.'}
         </p>
       </div>

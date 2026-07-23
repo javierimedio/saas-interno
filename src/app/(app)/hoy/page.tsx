@@ -64,39 +64,45 @@ export default async function DashboardPage() {
   const futureHiresList = futureHires(people, now)
 
   return (
-    <div className="flex flex-col gap-5 p-6">
+    <div className="mx-auto flex max-w-[1360px] flex-col gap-8 p-8">
       <div>
         <h1 className="text-nexo-title">Dashboard</h1>
-        <p className="text-nexo-subtitle mt-0.5 text-[13px]">
+        <p className="text-nexo-subtitle mt-0.5 text-[13px] capitalize">
           {now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Personas activas" value={String(activePeople.length)} />
-        <StatCard label="Masa salarial anual" value={formatCurrency(annualPayroll)} />
-        <StatCard label="Antigüedad media" value={`${avgTenure.toFixed(1)} años`} />
-        <StatCard
-          label="Acciones pendientes"
-          value={String(openActions.length)}
-          tone={overdueActions.length > 0 ? 'bad' : 'default'}
-          sub={overdueActions.length > 0 ? `${overdueActions.length} vencidas` : undefined}
-        />
-      </div>
+      <section className="flex flex-col gap-3">
+        <p className="text-nexo-label">Indicadores clave</p>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <StatCard label="Personas activas" value={String(activePeople.length)} />
+          <StatCard label="Masa salarial anual" value={formatCurrency(annualPayroll)} />
+          <StatCard label="Antigüedad media" value={`${avgTenure.toFixed(1)} años`} />
+          <StatCard
+            label="Acciones pendientes"
+            value={String(openActions.length)}
+            tone={overdueActions.length > 0 ? 'bad' : 'default'}
+            sub={overdueActions.length > 0 ? `${overdueActions.length} vencidas` : undefined}
+          />
+        </div>
+      </section>
 
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
-        <StatCard label="Empleados activos" value={String(activePeople.length)} />
-        <StatCard label="Empleados de baja" value={String(offboardedPeople.length)} />
-        <StatCard label="Incorporaciones futuras" value={String(futureHiresList.length)} />
-        <StatCard label="Excedencias" value={String(onLeavePeople.length)} />
-      </div>
+      <section className="flex flex-col gap-3">
+        <p className="text-nexo-label">Indicadores rápidos</p>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <StatCard label="Empleados activos" value={String(activePeople.length)} />
+          <StatCard label="Empleados de baja" value={String(offboardedPeople.length)} />
+          <StatCard label="Incorporaciones futuras" value={String(futureHiresList.length)} />
+          <StatCard label="Excedencias" value={String(onLeavePeople.length)} />
+        </div>
+      </section>
 
-      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <Card>
           <CardHeader>
             <CardTitle>One2One</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4 pt-0">
+          <CardContent className="flex flex-col gap-4">
             <div>
               <p className="mb-1 text-[10px] font-semibold uppercase tracking-wide text-text-faint">Próximos</p>
               {upcomingMeetings.length === 0 ? (
@@ -167,7 +173,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Acciones</CardTitle>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4 pt-0">
+          <CardContent className="flex flex-col gap-4">
             <ActionsGroup title="Vencidas" tone="bad" actions={overdueActions} namesById={namesById} />
             <ActionsGroup title="Hoy" tone="warn" actions={todayActions} namesById={namesById} />
             <ActionsGroup title="Esta semana" tone="default" actions={weekActions} namesById={namesById} />
@@ -178,7 +184,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Próximos cumpleaños</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent>
             {birthdays.length === 0 ? (
               <EmptyState title="Sin cumpleaños en los próximos 30 días" />
             ) : (
@@ -200,7 +206,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Revisiones salariales</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent>
             {salaryReviews.length === 0 ? (
               <EmptyState title="Sin revisiones pendientes próximamente" />
             ) : (
@@ -227,7 +233,7 @@ export default async function DashboardPage() {
           <CardHeader>
             <CardTitle>Altas recientes</CardTitle>
           </CardHeader>
-          <CardContent className="pt-0">
+          <CardContent>
             {recentHiresList.length === 0 ? (
               <EmptyState title="Sin altas en los últimos 30 días" />
             ) : (
