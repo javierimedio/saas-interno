@@ -78,13 +78,16 @@ export function SidebarNav() {
         })}
       </nav>
       <div className="mt-auto border-t border-border pt-2">
-        <div className="flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm text-muted-foreground/50" aria-disabled>
+        <Link
+          href="/settings"
+          className={cn(
+            'flex items-center gap-2.5 rounded-md px-2.5 py-1.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary hover:text-foreground',
+            pathname.startsWith('/settings') && 'bg-accent text-accent-foreground hover:bg-accent',
+          )}
+        >
           <Settings className="size-4" />
-          <span className="flex-1">Ajustes</span>
-          <span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-            Pronto
-          </span>
-        </div>
+          Ajustes
+        </Link>
       </div>
     </aside>
   )

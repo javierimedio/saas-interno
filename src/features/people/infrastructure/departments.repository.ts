@@ -36,3 +36,20 @@ export async function createDepartment(
 
   return data
 }
+
+export async function updateDepartment(client: TypedClient, id: string, name: string): Promise<DepartmentRow> {
+  const { data, error } = await client.from('departments').update({ name }).eq('id', id).select('*').single()
+
+  if (error) {
+    throw new Error(`No se pudo renombrar el departamento: ${error.message}`)
+  }
+
+  return data
+}
+
+export async function deleteDepartment(client: TypedClient, id: string): Promise<void> {
+  const { error } = await client.from('departments').delete().eq('id', id)
+  if (error) {
+    throw new Error(`No se pudo eliminar el departamento: ${error.message}`)
+  }
+}
