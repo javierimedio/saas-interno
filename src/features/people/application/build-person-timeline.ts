@@ -1,5 +1,6 @@
 import type { AuditLogRow } from '../infrastructure/audit-log.repository'
 import type { SalaryRecordRow } from '../infrastructure/salary-records.repository'
+import type { WorkingHoursRecordRow } from '../infrastructure/working-hours-records.repository'
 import type { DocumentRow } from '../infrastructure/documents.repository'
 import type { PersonTimelineEvent } from '../domain/timeline-event'
 import type { OneOnOneRow } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
@@ -54,6 +55,16 @@ function eventFromSalaryRecord(row: SalaryRecordRow): PersonTimelineEvent {
   }
 }
 
+function eventFromWorkingHoursRecord(row: WorkingHoursRecordRow): PersonTimelineEvent {
+  return {
+    id: row.id,
+    type: 'working_hours_change',
+    occurredAt: row.created_at,
+    title: row.reason,
+    detail: `${row.weekly_hours} h/semana${row.working_percentage ? ` (${row.working_percentage}%)` : ''}`,
+  }
+}
+
 function eventFromDocument(row: DocumentRow): PersonTimelineEvent {
   return {
     id: row.id,
@@ -96,6 +107,7 @@ export function buildPersonTimeline(
   documentRows: DocumentRow[],
   meetingRows: OneOnOneRow[] = [],
   actionRows: ActionRow[] = [],
+  workingHoursRows: WorkingHoursRecordRow[] = [],
 ): PersonTimelineEvent[] {
   const events = [
     ...auditRows.map(auditEventFromPeopleRow),
@@ -103,6 +115,7 @@ export function buildPersonTimeline(
     ...documentRows.map(eventFromDocument),
     ...meetingRows.map(eventFromMeeting).filter((e): e is PersonTimelineEvent => e !== null),
     ...actionRows.flatMap(eventsFromAction),
+    ...workingHoursRows.map(eventFromWorkingHoursRecord),
   ]
 
   return events.sort((a, b) => new Date(b.occurredAt).getTime() - new Date(a.occurredAt).getTime())

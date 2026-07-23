@@ -62,3 +62,10 @@ export function calculateAge(birthDate: string, referenceDate: Date): number {
   if (!hasHadBirthdayThisYear) age -= 1
   return age
 }
+
+const FULL_TIME_WEEKLY_HOURS = 40
+
+/** Jornada completa (40h/semana o más) frente a jornada reducida, a partir de las horas semanales vigentes. */
+export function workingHoursLabel(weeklyHours: number): string {
+  return weeklyHours >= FULL_TIME_WEEKLY_HOURS ? 'Jornada completa' : 'Jornada reducida'
+}

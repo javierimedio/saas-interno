@@ -89,6 +89,16 @@ export const salaryRecordSchema = z.object({
 })
 export type SalaryRecordInput = z.infer<typeof salaryRecordSchema>
 
+export const workingHoursRecordSchema = z.object({
+  personId: uuid,
+  effectiveDate: z.string().min(1, 'La fecha de efecto es obligatoria'),
+  weeklyHours: z.coerce.number().positive('Indica las horas semanales').max(80, 'Revisa las horas semanales'),
+  workingPercentage: z.coerce.number().positive().max(100, 'El porcentaje debe estar entre 0 y 100').optional(),
+  reason: z.string().trim().min(1, 'Indica el motivo del cambio').max(200),
+  notes: z.string().trim().max(500).optional(),
+})
+export type WorkingHoursRecordInput = z.infer<typeof workingHoursRecordSchema>
+
 export const privateNoteSchema = z.object({
   personId: uuid,
   note: z.string().trim().min(1, 'La nota no puede estar vacía').max(2000),

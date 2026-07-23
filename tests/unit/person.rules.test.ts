@@ -1,6 +1,13 @@
 import { describe, expect, it } from 'vitest'
 
-import { calculateAge, calculateTenure, fullName, initials, isSalaryReviewOverdue } from '@/features/people/domain/person.rules'
+import {
+  calculateAge,
+  calculateTenure,
+  fullName,
+  initials,
+  isSalaryReviewOverdue,
+  workingHoursLabel,
+} from '@/features/people/domain/person.rules'
 
 describe('fullName / initials', () => {
   it('combina nombre y apellidos', () => {
@@ -64,5 +71,16 @@ describe('calculateAge', () => {
 
   it('suma el año exactamente el día del cumpleaños', () => {
     expect(calculateAge('1990-07-22', new Date('2026-07-22'))).toBe(36)
+  })
+})
+
+describe('workingHoursLabel', () => {
+  it('considera jornada completa a partir de 40h/semana', () => {
+    expect(workingHoursLabel(40)).toBe('Jornada completa')
+    expect(workingHoursLabel(37.5)).toBe('Jornada reducida')
+  })
+
+  it('considera jornada reducida por debajo de 40h/semana', () => {
+    expect(workingHoursLabel(30)).toBe('Jornada reducida')
   })
 })

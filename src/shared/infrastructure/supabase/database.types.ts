@@ -280,6 +280,53 @@ export interface Database {
           },
         ]
       }
+      working_hours_records: {
+        Row: {
+          id: string
+          organization_id: string
+          person_id: string
+          effective_date: string
+          weekly_hours: number
+          working_percentage: number | null
+          reason: string
+          notes: string | null
+          created_by: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          organization_id: string
+          person_id: string
+          effective_date: string
+          weekly_hours: number
+          working_percentage?: number | null
+          reason: string
+          notes?: string | null
+          created_by: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          organization_id?: string
+          person_id?: string
+          effective_date?: string
+          weekly_hours?: number
+          working_percentage?: number | null
+          reason?: string
+          notes?: string | null
+          created_by?: string
+          created_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: 'working_hours_records_person_id_fkey'
+            columns: ['person_id']
+            isOneToOne: false
+            referencedRelation: 'people'
+            referencedColumns: ['id']
+          },
+        ]
+      }
       documents: {
         Row: {
           id: string

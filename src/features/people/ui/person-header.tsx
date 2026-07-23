@@ -1,16 +1,17 @@
 import Link from 'next/link'
-import { Cake, CalendarDays, Hourglass, IdCard, Mail, Pencil, Wallet } from 'lucide-react'
+import { Cake, CalendarDays, Clock, Hourglass, IdCard, Mail, Pencil, Wallet } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { fullName, calculateTenure, calculateAge } from '../domain/person.rules'
+import { fullName, calculateTenure, calculateAge, workingHoursLabel } from '../domain/person.rules'
 import { CONTRACT_TYPE_LABELS } from '../domain/person.schema'
 import { EmploymentStatusBadge } from './employment-status-badge'
 import { OffboardDialog } from './offboard-dialog'
 import type { PersonRow } from '../infrastructure/people.repository'
 import type { SalaryRecordRow } from '../infrastructure/salary-records.repository'
+import type { WorkingHoursRecordRow } from '../infrastructure/working-hours-records.repository'
 
 function formatCurrency(amount: number, currency: string): string {
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount)
@@ -34,12 +35,14 @@ export function PersonHeader({
   departmentName,
   managerName,
   latestSalary,
+  latestWorkingHours,
   now,
 }: {
   person: PersonRow
   departmentName?: string
   managerName?: string
   latestSalary?: SalaryRecordRow
+  latestWorkingHours?: WorkingHoursRecordRow
   now: Date
 }) {
   const name = fullName({ firstName: person.first_name, lastName: person.last_name })
@@ -85,6 +88,11 @@ export function PersonHeader({
           value={latestSalary ? formatCurrency(Number(latestSalary.gross_annual_salary), latestSalary.currency) : '—'}
         />
         <Field icon={Mail} label="Email" value={person.email} />
+        <Field
+          icon={Clock}
+          label={latestWorkingHours ? workingHoursLabel(latestWorkingHours.weekly_hours) : 'Jornada'}
+          value={latestWorkingHours ? `${latestWorkingHours.weekly_hours} h / semana` : 'Sin registrar'}
+        />
         <Field
           icon={Cake}
           label="Fecha de nacimiento"

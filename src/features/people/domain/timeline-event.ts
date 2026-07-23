@@ -9,6 +9,7 @@ export type PersonTimelineEventType =
   | 'status_change'
   | 'field_change'
   | 'salary_change'
+  | 'working_hours_change'
   | 'document_added'
   | 'one_on_one'
   | 'action_created'

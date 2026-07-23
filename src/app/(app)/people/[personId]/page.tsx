@@ -5,6 +5,7 @@ import { createClient } from '@/shared/infrastructure/supabase/server-client'
 import { getPersonById } from '@/features/people/infrastructure/people.repository'
 import { listDepartments } from '@/features/people/infrastructure/departments.repository'
 import { listSalaryRecords } from '@/features/people/infrastructure/salary-records.repository'
+import { listWorkingHoursRecords } from '@/features/people/infrastructure/working-hours-records.repository'
 import { listDocuments } from '@/features/people/infrastructure/documents.repository'
 import { listPrivateNotes } from '@/features/people/infrastructure/private-notes.repository'
 import { listAuditEventsForPerson } from '@/features/people/infrastructure/audit-log.repository'
@@ -14,6 +15,7 @@ import { PersonVitals } from '@/features/people/ui/person-vitals'
 import { PersonSectionNav } from '@/features/people/ui/person-section-nav'
 import { PersonTimeline } from '@/features/people/ui/person-timeline'
 import { SalaryHistoryPanel } from '@/features/people/ui/salary-history-panel'
+import { WorkingHoursHistoryPanel } from '@/features/people/ui/working-hours-history-panel'
 import { DocumentsPanel } from '@/features/people/ui/documents-panel'
 import { PrivateNotesPanel } from '@/features/people/ui/private-notes-panel'
 import { listMeetingsByPerson } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
@@ -44,6 +46,7 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
   const [
     departments,
     salaryRecords,
+    workingHoursRecords,
     documents,
     privateNotes,
     auditEvents,
@@ -61,6 +64,7 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
   ] = await Promise.all([
     listDepartments(supabase, person.organization_id),
     listSalaryRecords(supabase, person.id),
+    listWorkingHoursRecords(supabase, person.id),
     listDocuments(supabase, person.id),
     listPrivateNotes(supabase, person.id),
     listAuditEventsForPerson(supabase, person.id),
@@ -102,7 +106,7 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
   }
 
   const departmentName = departments.find((d) => d.id === person.department_id)?.name
-  const timeline = buildPersonTimeline(auditEvents, salaryRecords, documents, meetings, actions)
+  const timeline = buildPersonTimeline(auditEvents, salaryRecords, documents, meetings, actions, workingHoursRecords)
 
   const upcoming = meetings
     .filter((m) => (m.status === 'scheduled' || m.status === 'preparing') && new Date(m.scheduled_at) >= now)
@@ -118,6 +122,7 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
         departmentName={departmentName}
         managerName={managerName}
         latestSalary={salaryRecords[0]}
+        latestWorkingHours={workingHoursRecords[0]}
         now={now}
       />
       <PersonVitals
@@ -188,6 +193,17 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
           </CardHeader>
           <CardContent>
             <SalaryHistoryPanel personId={person.id} records={salaryRecords} />
+          </CardContent>
+        </Card>
+      </section>
+
+      <section id="jornada" className="scroll-mt-16">
+        <Card>
+          <CardHeader>
+            <CardTitle>Jornada</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <WorkingHoursHistoryPanel personId={person.id} records={workingHoursRecords} />
           </CardContent>
         </Card>
       </section>

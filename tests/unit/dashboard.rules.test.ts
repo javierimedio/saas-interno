@@ -3,11 +3,15 @@ import { describe, expect, it } from 'vitest'
 import {
   averageTenureYears,
   calculateAnnualPayroll,
+  cumulativeSalaryIncrease,
+  departmentDistribution,
   futureHires,
   groupActionsByUrgency,
+  initialSalaryByPerson,
   latestSalaryByPerson,
   nextBirthdayDate,
   recentHires,
+  salaryIncreaseByPerson,
   upcomingBirthdays,
   upcomingSalaryReviews,
 } from '@/features/dashboard/domain/dashboard.rules'
@@ -147,5 +151,53 @@ describe('recentHires / futureHires', () => {
     ]
     expect(recentHires(people, now, 30).map((p) => p.id)).toEqual(['p1'])
     expect(futureHires(people, now).map((p) => p.id)).toEqual(['p2'])
+  })
+})
+
+describe('departmentDistribution', () => {
+  it('cuenta las personas activas por departamento, de mayor a menor', () => {
+    const people = [
+      person({ id: 'p1', department_id: 'd1' }),
+      person({ id: 'p2', department_id: 'd1' }),
+      person({ id: 'p3', department_id: 'd2' }),
+      person({ id: 'p4', department_id: null }),
+    ]
+    const departmentNameById = new Map([
+      ['d1', 'Diseño gráfico'],
+      ['d2', 'Marketing'],
+    ])
+    expect(departmentDistribution(people, departmentNameById)).toEqual([
+      { departmentName: 'Diseño gráfico', count: 2 },
+      { departmentName: 'Marketing', count: 1 },
+      { departmentName: 'Sin departamento', count: 1 },
+    ])
+  })
+})
+
+describe('initialSalaryByPerson', () => {
+  it('se queda con el primer registro por persona (el más antiguo)', () => {
+    const records = [
+      salaryRecord({ id: 's1', person_id: 'p1', effective_date: '2024-01-01', gross_annual_salary: 20000 }),
+      salaryRecord({ id: 's2', person_id: 'p1', effective_date: '2025-01-01', gross_annual_salary: 22000 }),
+    ]
+    const map = initialSalaryByPerson(records)
+    expect(map.get('p1')?.gross_annual_salary).toBe(20000)
+  })
+})
+
+describe('salaryIncreaseByPerson / cumulativeSalaryIncrease', () => {
+  it('calcula el incremento de cada persona respecto a su salario inicial y lo suma', () => {
+    const people = [person({ id: 'p1' }), person({ id: 'p2' })]
+    const records = [
+      salaryRecord({ id: 's1', person_id: 'p1', effective_date: '2024-01-01', gross_annual_salary: 20000 }),
+      salaryRecord({ id: 's2', person_id: 'p1', effective_date: '2025-01-01', gross_annual_salary: 22000 }),
+      salaryRecord({ id: 's3', person_id: 'p2', effective_date: '2024-01-01', gross_annual_salary: 30000 }),
+    ]
+    const latest = latestSalaryByPerson(records)
+    const initial = initialSalaryByPerson(records)
+
+    const increases = salaryIncreaseByPerson(people, latest, initial)
+    expect(increases).toEqual([{ person: people[0], increase: 2000 }])
+    expect(cumulativeSalaryIncrease(increases)).toBe(2000)
   })
 })

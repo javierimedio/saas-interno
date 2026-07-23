@@ -10,6 +10,7 @@ const SECTIONS = [
   { id: 'acciones', label: 'Acciones' },
   { id: 'desarrollo', label: 'Desarrollo' },
   { id: 'compensacion', label: 'Compensación' },
+  { id: 'jornada', label: 'Jornada' },
   { id: 'documentos', label: 'Documentos' },
   { id: 'notas', label: 'Notas' },
   { id: 'informes', label: 'Informes' },

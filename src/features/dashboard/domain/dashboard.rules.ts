@@ -126,3 +126,56 @@ export function futureHires(people: PersonRow[], referenceDate: Date): PersonRow
     .filter((p) => new Date(p.hire_date) > referenceDate)
     .sort((a, b) => new Date(a.hire_date).getTime() - new Date(b.hire_date).getTime())
 }
+
+export type DepartmentHeadcount = { departmentName: string; count: number }
+
+/** Reparto del equipo activo por departamento, de mayor a menor número de personas. */
+export function departmentDistribution(
+  activePeople: PersonRow[],
+  departmentNameById: Map<string, string>,
+): DepartmentHeadcount[] {
+  const counts = new Map<string, number>()
+  for (const person of activePeople) {
+    const name = (person.department_id && departmentNameById.get(person.department_id)) || 'Sin departamento'
+    counts.set(name, (counts.get(name) ?? 0) + 1)
+  }
+  return Array.from(counts.entries())
+    .map(([departmentName, count]) => ({ departmentName, count }))
+    .sort((a, b) => b.count - a.count)
+}
+
+/** Primera fila de salary_records por persona (salario inicial registrado). */
+export function initialSalaryByPerson(records: SalaryRecordRow[]): Map<string, SalaryRecordRow> {
+  const map = new Map<string, SalaryRecordRow>()
+  for (const record of records) {
+    const existing = map.get(record.person_id)
+    if (!existing || record.effective_date < existing.effective_date) {
+      map.set(record.person_id, record)
+    }
+  }
+  return map
+}
+
+export type SalaryIncrease = { person: PersonRow; increase: number }
+
+/** Incremento del salario bruto anual de cada persona activa, respecto a su salario inicial registrado. */
+export function salaryIncreaseByPerson(
+  activePeople: PersonRow[],
+  latestByPerson: Map<string, SalaryRecordRow>,
+  initialByPerson: Map<string, SalaryRecordRow>,
+): SalaryIncrease[] {
+  return activePeople
+    .map((person) => {
+      const latest = latestByPerson.get(person.id)
+      const initial = initialByPerson.get(person.id)
+      if (!latest || !initial) return null
+      return { person, increase: Number(latest.gross_annual_salary) - Number(initial.gross_annual_salary) }
+    })
+    .filter((entry): entry is SalaryIncrease => entry !== null && entry.increase !== 0)
+    .sort((a, b) => b.increase - a.increase)
+}
+
+/** Incremento acumulado del gasto salarial anual del equipo activo, respecto al salario inicial de cada persona. */
+export function cumulativeSalaryIncrease(increases: SalaryIncrease[]): number {
+  return increases.reduce((total, entry) => total + entry.increase, 0)
+}

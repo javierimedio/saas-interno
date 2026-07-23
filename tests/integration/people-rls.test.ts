@@ -151,6 +151,55 @@ describe.skipIf(!connectionString)('RLS de people/salary_records (integración)'
     })
   })
 
+  it('working_hours_records: mismo alcance que salary_records y también append-only', async () => {
+    const adminAUserId = await createUser('admin-working-hours')
+    const adminBUserId = await createUser('admin-working-hours-b')
+
+    const orgId = await asUser(adminAUserId, async () => {
+      const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org Working Hours'])
+      return rows[0].id
+    })
+    await asUser(adminBUserId, async () => {
+      await client.query('select bootstrap_organization($1)', ['Org Working Hours B'])
+    })
+
+    const person = await asUser(adminAUserId, async () => {
+      const { rows } = await client.query(
+        `select * from create_person_with_initial_salary($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
+        [orgId, 'Fuensanta', 'Ruiz', 'fuensanta@test.local', null, 'Diseñadora', null, null, '2018-02-22', 'indefinido', 28000, 'EUR'],
+      )
+      return rows[0]
+    })
+
+    const record = await asUser(adminAUserId, async () => {
+      const { rows } = await client.query(
+        `insert into working_hours_records (organization_id, person_id, effective_date, weekly_hours, reason, created_by)
+         values ($1, $2, $3, $4, $5, $6) returning *`,
+        [orgId, person.id, '2026-09-07', 30, 'Reducción de jornada', adminAUserId],
+      )
+      return rows[0]
+    })
+    expect(Number(record.weekly_hours)).toBe(30)
+
+    const visibleToAdminB = await asUser(adminBUserId, async () => {
+      const { rows } = await client.query('select id from working_hours_records where person_id = $1', [person.id])
+      return rows
+    })
+    expect(visibleToAdminB).toHaveLength(0)
+
+    await asUser(adminAUserId, async () => {
+      await expect(
+        client.query('update working_hours_records set weekly_hours = 99 where person_id = $1', [person.id]),
+      ).rejects.toThrow(/permission denied/i)
+    })
+
+    await asUser(adminAUserId, async () => {
+      await expect(
+        client.query('delete from working_hours_records where person_id = $1', [person.id]),
+      ).rejects.toThrow(/permission denied/i)
+    })
+  })
+
   it('un empleado solo ve su propia ficha, nunca la de otros compañeros (modelo de dos roles)', async () => {
     const adminUserId = await createUser('admin-employee-scope')
     const employeeUserId = await createUser('employee')

@@ -7,6 +7,7 @@ import { EmptyState } from '@/components/shared/empty-state'
 import { createClient } from '@/shared/infrastructure/supabase/server-client'
 import { requireCurrentSession } from '@/shared/infrastructure/supabase/current-session'
 import { listAllPeople } from '@/features/people/infrastructure/people.repository'
+import { listDepartments } from '@/features/people/infrastructure/departments.repository'
 import { listSalaryRecordsGlobal } from '@/features/people/infrastructure/salary-records.repository'
 import {
   listOverdueMeetings,
@@ -17,17 +18,27 @@ import { listActionsGlobal } from '@/features/actions/infrastructure/actions.rep
 import {
   averageTenureYears,
   calculateAnnualPayroll,
+  cumulativeSalaryIncrease,
+  departmentDistribution,
   futureHires,
   groupActionsByUrgency,
+  initialSalaryByPerson,
   latestSalaryByPerson,
   recentHires,
+  salaryIncreaseByPerson,
   upcomingBirthdays,
   upcomingSalaryReviews,
 } from '@/features/dashboard/domain/dashboard.rules'
 import { StatCard } from '@/features/dashboard/ui/stat-card'
+import { DepartmentDistribution } from '@/features/dashboard/ui/department-distribution'
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency: 'EUR', maximumFractionDigits: 0 }).format(amount)
+}
+
+function formatSignedCurrency(amount: number): string {
+  const formatted = formatCurrency(Math.abs(amount))
+  return amount >= 0 ? `+${formatted}` : `-${formatted}`
 }
 
 export default async function DashboardPage() {
@@ -38,8 +49,9 @@ export default async function DashboardPage() {
   const supabase = await createClient()
   const now = new Date()
 
-  const [people, salaryRecords, upcomingMeetings, overdueMeetings, recentMeetings, actions] = await Promise.all([
+  const [people, departments, salaryRecords, upcomingMeetings, overdueMeetings, recentMeetings, actions] = await Promise.all([
     listAllPeople(supabase, session.organizationId),
+    listDepartments(supabase, session.organizationId),
     listSalaryRecordsGlobal(supabase, session.organizationId),
     listUpcomingMeetings(supabase, session.organizationId, now.toISOString(), 5),
     listOverdueMeetings(supabase, session.organizationId, now.toISOString()),
@@ -62,6 +74,12 @@ export default async function DashboardPage() {
   const salaryReviews = upcomingSalaryReviews(activePeople, latestByPerson, now)
   const recentHiresList = recentHires(people, now, 30)
   const futureHiresList = futureHires(people, now)
+
+  const departmentNameById = new Map(departments.map((d) => [d.id, d.name]))
+  const distribution = departmentDistribution(activePeople, departmentNameById)
+  const initialByPerson = initialSalaryByPerson(salaryRecords)
+  const salaryIncreases = salaryIncreaseByPerson(activePeople, latestByPerson, initialByPerson)
+  const totalSalaryIncrease = cumulativeSalaryIncrease(salaryIncreases)
 
   return (
     <div className="flex flex-col gap-5 p-6">
@@ -247,6 +265,54 @@ export default async function DashboardPage() {
                         {p.first_name} {p.last_name} · {p.position_title}
                       </span>
                       <span className="tabular-nums text-text-faint">{new Date(p.hire_date).toLocaleDateString('es-ES')}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Distribución del equipo</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {distribution.length === 0 ? (
+              <EmptyState title="Sin personas activas todavía" />
+            ) : (
+              <DepartmentDistribution data={distribution} />
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Incremento salarial acumulado</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            <div>
+              <p className="text-[28px] leading-none font-bold tabular-nums text-foreground">
+                {formatSignedCurrency(totalSalaryIncrease)}
+              </p>
+              <p className="text-nexo-label mt-2">Respecto al salario inicial de cada persona activa</p>
+            </div>
+            {salaryIncreases.length === 0 ? (
+              <p className="text-sm text-muted-foreground">Sin variaciones registradas todavía.</p>
+            ) : (
+              <ul className="divide-y divide-border">
+                {salaryIncreases.slice(0, 5).map((entry) => (
+                  <li key={entry.person.id}>
+                    <Link
+                      href={`/people/${entry.person.id}`}
+                      className="flex items-center justify-between gap-2 py-1.5 text-sm transition-colors hover:bg-secondary/50"
+                    >
+                      <span>
+                        {entry.person.first_name} {entry.person.last_name}
+                      </span>
+                      <span className={`tabular-nums font-semibold ${entry.increase >= 0 ? 'text-success' : 'text-destructive'}`}>
+                        {formatSignedCurrency(entry.increase)}
+                      </span>
                     </Link>
                   </li>
                 ))}
