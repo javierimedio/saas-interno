@@ -1,6 +1,14 @@
 import { describe, expect, it } from 'vitest'
 
-import { getMonthGridDays, getRangeForView, getWeekDays, isSameDay, shiftDate } from '@/features/calendar/domain/calendar.rules'
+import {
+  getMonthGridDays,
+  getRangeForView,
+  getWeekDays,
+  isDateWithinRange,
+  isMonthDayMatch,
+  isSameDay,
+  shiftDate,
+} from '@/features/calendar/domain/calendar.rules'
 
 describe('getMonthGridDays', () => {
   it('siempre devuelve semanas completas (múltiplo de 7)', () => {
@@ -46,5 +54,20 @@ describe('shiftDate', () => {
   it('avanza un mes en vista mes', () => {
     const next = shiftDate('month', new Date('2026-07-22'), 1)
     expect(next.getMonth()).toBe(7) // agosto
+  })
+})
+
+describe('isMonthDayMatch', () => {
+  it('coincide con mes y día sin importar el año (cumpleaños recurrentes)', () => {
+    expect(isMonthDayMatch('1990-07-22', new Date('2026-07-22'))).toBe(true)
+    expect(isMonthDayMatch('1990-07-23', new Date('2026-07-22'))).toBe(false)
+  })
+})
+
+describe('isDateWithinRange', () => {
+  it('incluye los extremos del rango', () => {
+    expect(isDateWithinRange(new Date('2026-07-20T10:00:00'), '2026-07-20', '2026-07-25')).toBe(true)
+    expect(isDateWithinRange(new Date('2026-07-25T10:00:00'), '2026-07-20', '2026-07-25')).toBe(true)
+    expect(isDateWithinRange(new Date('2026-07-26T10:00:00'), '2026-07-20', '2026-07-25')).toBe(false)
   })
 })

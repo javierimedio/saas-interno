@@ -72,3 +72,15 @@ export function shiftDate(view: CalendarView, date: Date, direction: 1 | -1): Da
 export function isSameDay(a: Date, b: Date): boolean {
   return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate()
 }
+
+/** Compara solo mes/día (para cumpleaños, que se repiten cada año). */
+export function isMonthDayMatch(isoDate: string, day: Date): boolean {
+  const d = new Date(`${isoDate}T00:00:00`)
+  return d.getMonth() === day.getMonth() && d.getDate() === day.getDate()
+}
+
+export function isDateWithinRange(day: Date, startDate: string, endDate: string): boolean {
+  const start = new Date(`${startDate}T00:00:00`)
+  const end = new Date(`${endDate}T23:59:59`)
+  return day >= start && day <= end
+}

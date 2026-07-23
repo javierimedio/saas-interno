@@ -175,3 +175,17 @@ export async function listManagerCandidates(
   }
   return data ?? []
 }
+
+/** Roster completo sin paginar, para agregados de dashboard/calendario (KPIs, cumpleaños, altas). */
+export async function listAllPeople(client: TypedClient, organizationId: string): Promise<PersonRow[]> {
+  const { data, error } = await client
+    .from('people')
+    .select('*')
+    .eq('organization_id', organizationId)
+    .order('first_name', { ascending: true })
+
+  if (error) {
+    throw new Error(`No se pudo cargar el roster: ${error.message}`)
+  }
+  return data ?? []
+}
