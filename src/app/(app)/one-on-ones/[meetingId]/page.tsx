@@ -45,7 +45,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ meetin
         <div className="flex items-center gap-3">
           <Avatar name={personName} size="lg" />
           <div>
-            <h1 className="text-base font-semibold">1:1 con {personName}</h1>
+            <h1 className="text-nexo-title">1:1 con {personName}</h1>
             <p className="text-sm text-muted-foreground">
               {new Date(meeting.scheduled_at).toLocaleString('es-ES', {
                 weekday: 'long',

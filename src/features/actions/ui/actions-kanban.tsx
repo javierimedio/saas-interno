@@ -15,8 +15,8 @@ import type { Database } from '@/shared/infrastructure/supabase/database.types'
 type ActionStatus = Database['public']['Enums']['action_status']
 
 const PRIORITY_BORDER: Record<string, string> = {
-  low: 'border-l-border-strong',
-  medium: 'border-l-primary',
+  low: 'border-l-border',
+  medium: 'border-l-info',
   high: 'border-l-warning',
   urgent: 'border-l-destructive',
 }
@@ -65,11 +65,11 @@ export function ActionsKanban({
             key={status}
             onDragOver={(e) => e.preventDefault()}
             onDrop={() => handleDrop(status)}
-            className="flex flex-col gap-2 rounded-lg bg-secondary/30 p-2"
+            className="flex flex-col gap-2 rounded-md bg-muted/60 p-2"
           >
-            <div className="flex items-center justify-between px-1">
-              <span className="text-xs font-semibold">{ACTION_STATUS_LABELS[status]}</span>
-              <span className="text-xs tabular-nums text-text-faint">{columnActions.length}</span>
+            <div className="flex items-center justify-between px-1.5 py-1">
+              <span className="text-nexo-label">{ACTION_STATUS_LABELS[status]}</span>
+              <span className="text-[11px] font-bold tabular-nums text-text-faint">{columnActions.length}</span>
             </div>
             {columnActions.map((action) => {
               const overdue = isActionOverdue(action.due_date, action.status, now)
@@ -79,9 +79,9 @@ export function ActionsKanban({
                   key={action.id}
                   draggable
                   onDragStart={() => setDragId(action.id)}
-                  className={`cursor-grab rounded-md border border-l-[3px] border-border bg-card p-2.5 text-sm shadow-xs active:cursor-grabbing ${PRIORITY_BORDER[action.priority]}`}
+                  className={`cursor-grab rounded-md border border-l-[3px] border-border bg-card p-2.5 text-[13px] shadow-nexo transition-shadow hover:shadow-md active:cursor-grabbing ${PRIORITY_BORDER[action.priority]}`}
                 >
-                  <p className="font-medium">{action.title}</p>
+                  <p className="font-semibold">{action.title}</p>
                   <p className="mt-1 text-xs text-text-faint">{peopleNamesById.get(action.assignee_id) ?? '—'}</p>
                   {action.due_date ? (
                     <p className={`mt-1 text-xs ${overdue ? 'font-semibold text-destructive' : 'text-text-faint'}`}>

@@ -69,16 +69,16 @@ export function PersonVitals({
 
 function VitalCard({ label, value, tone = 'default' }: { label: string; value: string; tone?: 'default' | 'warn' | 'bad' | 'good' }) {
   const toneClass = {
-    default: '',
+    default: 'text-foreground',
     warn: 'text-warning',
     bad: 'text-destructive',
     good: 'text-success',
   }[tone]
 
   return (
-    <div className="rounded-lg border border-border bg-card px-3.5 py-2.5">
-      <p className="text-[10.5px] font-semibold uppercase tracking-wide text-text-faint">{label}</p>
-      <p className={`text-sm font-semibold tabular-nums ${toneClass}`}>{value}</p>
+    <div className="rounded-md border border-border bg-card px-3.5 py-2.5 shadow-nexo">
+      <p className="text-nexo-label">{label}</p>
+      <p className={`mt-0.5 text-[13px] font-bold tabular-nums ${toneClass}`}>{value}</p>
     </div>
   )
 }
