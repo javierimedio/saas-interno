@@ -121,6 +121,7 @@ export interface Database {
           termination_date: string | null
           employment_status: Database['public']['Enums']['employment_status']
           contract_type: Database['public']['Enums']['contract_type']
+          birth_date: string | null
           created_at: string
           updated_at: string
         }
@@ -140,6 +141,7 @@ export interface Database {
           termination_date?: string | null
           employment_status?: Database['public']['Enums']['employment_status']
           contract_type: Database['public']['Enums']['contract_type']
+          birth_date?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -159,6 +161,7 @@ export interface Database {
           termination_date?: string | null
           employment_status?: Database['public']['Enums']['employment_status']
           contract_type?: Database['public']['Enums']['contract_type']
+          birth_date?: string | null
           created_at?: string
           updated_at?: string
         }
@@ -575,6 +578,155 @@ export interface Database {
           },
         ]
       }
+      action_comments: {
+        Row: { id: string; action_id: string; author_id: string; comment: string; created_at: string }
+        Insert: { id?: string; action_id: string; author_id: string; comment: string; created_at?: string }
+        Update: { id?: string; action_id?: string; author_id?: string; comment?: string; created_at?: string }
+        Relationships: [
+          { foreignKeyName: 'action_comments_action_id_fkey'; columns: ['action_id']; isOneToOne: false; referencedRelation: 'actions'; referencedColumns: ['id'] },
+        ]
+      }
+      goals: {
+        Row: {
+          id: string; organization_id: string; person_id: string; title: string; description: string | null
+          category: string | null; year: number; start_date: string; end_date: string
+          status: Database['public']['Enums']['goal_status']; weight: number | null
+          created_by: string; created_at: string; updated_at: string
+        }
+        Insert: {
+          id?: string; organization_id: string; person_id: string; title: string; description?: string | null
+          category?: string | null; year: number; start_date: string; end_date: string
+          status?: Database['public']['Enums']['goal_status']; weight?: number | null
+          created_by: string; created_at?: string; updated_at?: string
+        }
+        Update: {
+          id?: string; organization_id?: string; person_id?: string; title?: string; description?: string | null
+          category?: string | null; year?: number; start_date?: string; end_date?: string
+          status?: Database['public']['Enums']['goal_status']; weight?: number | null
+          created_by?: string; created_at?: string; updated_at?: string
+        }
+        Relationships: [
+          { foreignKeyName: 'goals_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+        ]
+      }
+      goal_checkins: {
+        Row: { id: string; goal_id: string; checkin_date: string; progress_percent: number; comment: string | null; created_by: string; created_at: string }
+        Insert: { id?: string; goal_id: string; checkin_date?: string; progress_percent: number; comment?: string | null; created_by: string; created_at?: string }
+        Update: { id?: string; goal_id?: string; checkin_date?: string; progress_percent?: number; comment?: string | null; created_by?: string; created_at?: string }
+        Relationships: [
+          { foreignKeyName: 'goal_checkins_goal_id_fkey'; columns: ['goal_id']; isOneToOne: false; referencedRelation: 'goals'; referencedColumns: ['id'] },
+        ]
+      }
+      competencies: {
+        Row: { id: string; organization_id: string; name: string; description: string | null; created_at: string }
+        Insert: { id?: string; organization_id: string; name: string; description?: string | null; created_at?: string }
+        Update: { id?: string; organization_id?: string; name?: string; description?: string | null; created_at?: string }
+        Relationships: []
+      }
+      person_competencies: {
+        Row: {
+          id: string; organization_id: string; person_id: string; competency_id: string; level: number
+          assessed_at: string; assessed_by: string; notes: string | null; created_at: string
+        }
+        Insert: {
+          id?: string; organization_id: string; person_id: string; competency_id: string; level: number
+          assessed_at?: string; assessed_by: string; notes?: string | null; created_at?: string
+        }
+        Update: {
+          id?: string; organization_id?: string; person_id?: string; competency_id?: string; level?: number
+          assessed_at?: string; assessed_by?: string; notes?: string | null; created_at?: string
+        }
+        Relationships: [
+          { foreignKeyName: 'person_competencies_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+          { foreignKeyName: 'person_competencies_competency_id_fkey'; columns: ['competency_id']; isOneToOne: false; referencedRelation: 'competencies'; referencedColumns: ['id'] },
+        ]
+      }
+      trainings: {
+        Row: {
+          id: string; organization_id: string; person_id: string; title: string; provider: string | null
+          status: Database['public']['Enums']['training_status']; start_date: string | null; end_date: string | null
+          certificate_document_id: string | null; created_by: string; created_at: string; updated_at: string
+        }
+        Insert: {
+          id?: string; organization_id: string; person_id: string; title: string; provider?: string | null
+          status?: Database['public']['Enums']['training_status']; start_date?: string | null; end_date?: string | null
+          certificate_document_id?: string | null; created_by: string; created_at?: string; updated_at?: string
+        }
+        Update: {
+          id?: string; organization_id?: string; person_id?: string; title?: string; provider?: string | null
+          status?: Database['public']['Enums']['training_status']; start_date?: string | null; end_date?: string | null
+          certificate_document_id?: string | null; created_by?: string; created_at?: string; updated_at?: string
+        }
+        Relationships: [
+          { foreignKeyName: 'trainings_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+        ]
+      }
+      career_plans: {
+        Row: { id: string; organization_id: string; person_id: string; target_position: string; notes: string | null; created_by: string; created_at: string; updated_at: string }
+        Insert: { id?: string; organization_id: string; person_id: string; target_position: string; notes?: string | null; created_by: string; created_at?: string; updated_at?: string }
+        Update: { id?: string; organization_id?: string; person_id?: string; target_position?: string; notes?: string | null; created_by?: string; created_at?: string; updated_at?: string }
+        Relationships: [
+          { foreignKeyName: 'career_plans_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+        ]
+      }
+      career_plan_milestones: {
+        Row: { id: string; career_plan_id: string; title: string; target_date: string | null; completed_at: string | null; created_at: string }
+        Insert: { id?: string; career_plan_id: string; title: string; target_date?: string | null; completed_at?: string | null; created_at?: string }
+        Update: { id?: string; career_plan_id?: string; title?: string; target_date?: string | null; completed_at?: string | null; created_at?: string }
+        Relationships: [
+          { foreignKeyName: 'career_plan_milestones_career_plan_id_fkey'; columns: ['career_plan_id']; isOneToOne: false; referencedRelation: 'career_plans'; referencedColumns: ['id'] },
+        ]
+      }
+      feedback_entries: {
+        Row: { id: string; organization_id: string; person_id: string; author_id: string; text: string; visibility: Database['public']['Enums']['feedback_visibility']; created_at: string }
+        Insert: { id?: string; organization_id: string; person_id: string; author_id: string; text: string; visibility?: Database['public']['Enums']['feedback_visibility']; created_at?: string }
+        Update: { id?: string; organization_id?: string; person_id?: string; author_id?: string; text?: string; visibility?: Database['public']['Enums']['feedback_visibility']; created_at?: string }
+        Relationships: [
+          { foreignKeyName: 'feedback_entries_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+        ]
+      }
+      evaluations: {
+        Row: { id: string; organization_id: string; person_id: string; period: string; result: string; evaluator_id: string; notes: string | null; created_at: string }
+        Insert: { id?: string; organization_id: string; person_id: string; period: string; result: string; evaluator_id: string; notes?: string | null; created_at?: string }
+        Update: { id?: string; organization_id?: string; person_id?: string; period?: string; result?: string; evaluator_id?: string; notes?: string | null; created_at?: string }
+        Relationships: [
+          { foreignKeyName: 'evaluations_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+        ]
+      }
+      time_off: {
+        Row: { id: string; organization_id: string; person_id: string; start_date: string; end_date: string; type: Database['public']['Enums']['time_off_type']; notes: string | null; created_by: string; created_at: string }
+        Insert: { id?: string; organization_id: string; person_id: string; start_date: string; end_date: string; type?: Database['public']['Enums']['time_off_type']; notes?: string | null; created_by: string; created_at?: string }
+        Update: { id?: string; organization_id?: string; person_id?: string; start_date?: string; end_date?: string; type?: Database['public']['Enums']['time_off_type']; notes?: string | null; created_by?: string; created_at?: string }
+        Relationships: [
+          { foreignKeyName: 'time_off_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+        ]
+      }
+      holidays: {
+        Row: { id: string; organization_id: string; date: string; name: string; created_at: string }
+        Insert: { id?: string; organization_id: string; date: string; name: string; created_at?: string }
+        Update: { id?: string; organization_id?: string; date?: string; name?: string; created_at?: string }
+        Relationships: []
+      }
+      reports: {
+        Row: {
+          id: string; organization_id: string; person_id: string | null; one_on_one_id: string | null
+          type: Database['public']['Enums']['report_type']; generated_by: string; storage_path: string
+          params: Json; generated_at: string
+        }
+        Insert: {
+          id?: string; organization_id: string; person_id?: string | null; one_on_one_id?: string | null
+          type: Database['public']['Enums']['report_type']; generated_by: string; storage_path: string
+          params?: Json; generated_at?: string
+        }
+        Update: {
+          id?: string; organization_id?: string; person_id?: string | null; one_on_one_id?: string | null
+          type?: Database['public']['Enums']['report_type']; generated_by?: string; storage_path?: string
+          params?: Json; generated_at?: string
+        }
+        Relationships: [
+          { foreignKeyName: 'reports_person_id_fkey'; columns: ['person_id']; isOneToOne: false; referencedRelation: 'people'; referencedColumns: ['id'] },
+        ]
+      }
     }
     Views: Record<string, never>
     Functions: {
@@ -620,6 +772,11 @@ export interface Database {
       meeting_mode: 'in_person' | 'video' | 'phone'
       action_status: 'pending' | 'in_progress' | 'blocked' | 'completed' | 'cancelled'
       action_priority: 'low' | 'medium' | 'high' | 'urgent'
+      goal_status: 'on_track' | 'at_risk' | 'off_track' | 'completed' | 'cancelled'
+      training_status: 'planned' | 'in_progress' | 'completed' | 'cancelled'
+      feedback_visibility: 'manager_only' | 'shared_with_employee'
+      time_off_type: 'vacation' | 'sick_leave' | 'other'
+      report_type: 'one_on_one_pdf' | 'employee_summary' | 'employee_annual' | 'employee_full'
     }
   }
 }

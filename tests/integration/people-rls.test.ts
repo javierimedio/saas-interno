@@ -151,42 +151,34 @@ describe.skipIf(!connectionString)('RLS de people/salary_records (integración)'
     })
   })
 
-  it('un manager solo ve a las personas de su propio equipo', async () => {
-    const adminAUserId = await createUser('admin-manager-scope')
-    const managerUserId = await createUser('manager')
-    const orgId = await asUser(adminAUserId, async () => {
-      const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org Manager Scope'])
+  it('un empleado solo ve su propia ficha, nunca la de otros compañeros (modelo de dos roles)', async () => {
+    const adminUserId = await createUser('admin-employee-scope')
+    const employeeUserId = await createUser('employee')
+    const orgId = await asUser(adminUserId, async () => {
+      const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org Employee Scope'])
       return rows[0].id
     })
 
-    // El manager necesita su propia fila de `people` vinculada a su user_id para que
-    // current_person_id() lo resuelva (docs/03-modelo-datos.md §3.10).
-    const managerPerson = await asUser(adminAUserId, async () => {
+    // El empleado necesita su propia fila de `people` vinculada a su user_id para que
+    // people_select lo resuelva por auto-servicio (docs/03-modelo-datos.md §3.10).
+    const employeePerson = await asUser(adminUserId, async () => {
       const { rows } = await client.query(
         `select * from create_person_with_initial_salary($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
-        [orgId, 'Sara', 'Gómez', 'sara@test.local', null, 'Manager', null, null, '2022-01-01', 'indefinido', 40000, 'EUR'],
+        [orgId, 'Sara', 'Gómez', 'sara@test.local', null, 'Growth Marketer', null, null, '2022-01-01', 'indefinido', 32000, 'EUR'],
       )
       return rows[0]
     })
-    await asUser(adminAUserId, () =>
-      client.query('update people set user_id = $1 where id = $2', [managerUserId, managerPerson.id]),
+    await asUser(adminUserId, () =>
+      client.query('update people set user_id = $1 where id = $2', [employeeUserId, employeePerson.id]),
     )
     // Sin policy de insert en memberships (docs/03-modelo-datos.md §3.10: solo se crean vía
     // bootstrap_organization() o, en el futuro, un flujo de invitación con security definer).
-    await adminClient.query(`insert into memberships (organization_id, user_id, role) values ($1, $2, 'manager')`, [
+    await adminClient.query(`insert into memberships (organization_id, user_id, role) values ($1, $2, 'employee')`, [
       orgId,
-      managerUserId,
+      employeeUserId,
     ])
 
-    const directReport = await asUser(adminAUserId, async () => {
-      const { rows } = await client.query(
-        `select * from create_person_with_initial_salary($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
-        [orgId, 'Mario', 'Iglesias', 'mario@test.local', null, 'Diseñador', null, managerPerson.id, '2024-06-01', 'indefinido', 26000, 'EUR'],
-      )
-      return rows[0]
-    })
-
-    const notManaged = await asUser(adminAUserId, async () => {
+    const colleague = await asUser(adminUserId, async () => {
       const { rows } = await client.query(
         `select * from create_person_with_initial_salary($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)`,
         [orgId, 'Elena', 'Castro', 'elena@test.local', null, 'Social Media', null, null, '2024-06-01', 'indefinido', 24000, 'EUR'],
@@ -194,15 +186,31 @@ describe.skipIf(!connectionString)('RLS de people/salary_records (integración)'
       return rows[0]
     })
 
-    const visibleToManager = await asUser(managerUserId, async () => {
+    const visibleToEmployee = await asUser(employeeUserId, async () => {
       const { rows } = await client.query('select id from people where organization_id = $1 order by first_name', [
         orgId,
       ])
       return rows.map((r) => r.id)
     })
 
-    expect(visibleToManager).toContain(directReport.id)
-    expect(visibleToManager).toContain(managerPerson.id) // se ve a sí misma
-    expect(visibleToManager).not.toContain(notManaged.id)
+    expect(visibleToEmployee).toEqual([employeePerson.id]) // solo se ve a sí misma
+    expect(visibleToEmployee).not.toContain(colleague.id)
+
+    const salaryVisibleToEmployee = await asUser(employeeUserId, async () => {
+      const { rows } = await client.query('select person_id from salary_records where organization_id = $1', [orgId])
+      return rows.map((r) => r.person_id)
+    })
+    expect(salaryVisibleToEmployee).toEqual([employeePerson.id])
+
+    const updateResult = await asUser(employeeUserId, () =>
+      client.query('update people set position_title = $1 where id = $2', ['Hacked', employeePerson.id]),
+    )
+    expect(updateResult.rowCount).toBe(0) // RLS bloquea el update: solo admin puede escribir
+
+    const positionTitleAfter = await asUser(adminUserId, async () => {
+      const { rows } = await client.query('select position_title from people where id = $1', [employeePerson.id])
+      return rows[0].position_title
+    })
+    expect(positionTitleAfter).toBe('Growth Marketer')
   })
 })

@@ -42,3 +42,27 @@ export const changeActionStatusSchema = z
     path: ['blockedReason'],
   })
 export type ChangeActionStatusInput = z.infer<typeof changeActionStatusSchema>
+
+export const updateActionSchema = z.object({
+  id: uuid,
+  title: z.string().trim().min(1, 'El título es obligatorio').max(200),
+  description: z.string().trim().max(2000).optional(),
+  priority: z.enum(ACTION_PRIORITY),
+  dueDate: z.string().optional(),
+  assigneeId: uuid,
+})
+export type UpdateActionInput = z.infer<typeof updateActionSchema>
+
+export const addActionCommentSchema = z.object({
+  actionId: uuid,
+  comment: z.string().trim().min(1, 'El comentario no puede estar vacío').max(2000),
+})
+export type AddActionCommentInput = z.infer<typeof addActionCommentSchema>
+
+export const actionListFiltersSchema = z.object({
+  personId: z.string().uuid().optional(),
+  assigneeId: z.string().uuid().optional(),
+  priority: z.enum(ACTION_PRIORITY).optional(),
+  overdueOnly: z.coerce.boolean().optional(),
+})
+export type ActionListFilters = z.infer<typeof actionListFiltersSchema>

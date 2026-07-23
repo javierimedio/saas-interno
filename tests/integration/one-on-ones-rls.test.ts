@@ -4,7 +4,8 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
 /**
  * Integración real de RLS para one_on_ones/actions (docs/03-modelo-datos.md §3.10,
- * supabase/migrations/20260722130300_one_on_one_rls.sql). Requiere la misma base de datos
+ * supabase/migrations/20260722160000_simplify_two_role_model.sql — modelo de dos roles:
+ * admin gestiona todo, employee solo ve lo suyo). Requiere la misma base de datos
  * de pruebas que people-rls.test.ts — ver ./scripts/setup-test-db.sh.
  */
 const connectionString = process.env.TEST_DATABASE_URL
@@ -20,7 +21,7 @@ describe.skipIf(!connectionString)('RLS de one_on_ones/actions (integración)', 
 
   /** memberships no tiene policy de insert (docs/03-modelo-datos.md §3.10) — se crea vía
    * bootstrap_organization() o, en el futuro, un flujo de invitación. Para el fixture de este
-   * test (vincular un manager ya existente) se usa una conexión superusuario. */
+   * test (vincular un empleado ya existente) se usa una conexión superusuario. */
   async function addMembership(orgId: string, userId: string, role: string) {
     await adminClient.query('insert into memberships (organization_id, user_id, role) values ($1, $2, $3)', [
       orgId,
@@ -59,9 +60,9 @@ describe.skipIf(!connectionString)('RLS de one_on_ones/actions (integración)', 
     await adminClient.end()
   })
 
-  it('el manager ve sus propias reuniones; otro admin de otra organización no', async () => {
+  it('el empleado ve sus propias reuniones (sin poder crearlas); otro admin de otra organización no', async () => {
     const adminId = await createUser('admin-ooo')
-    const managerUserId = await createUser('manager-ooo')
+    const employeeUserId = await createUser('employee-ooo')
     const otherAdminId = await createUser('other-admin-ooo')
 
     const orgId = await asUser(adminId, async () => {
@@ -70,27 +71,38 @@ describe.skipIf(!connectionString)('RLS de one_on_ones/actions (integración)', 
     })
     await asUser(otherAdminId, () => client.query('select bootstrap_organization($1)', ['Org OOO Other']))
 
-    const manager = await asUser(adminId, () => createPerson(orgId, 'Manager', null))
+    const adminPerson = await asUser(adminId, () => createPerson(orgId, 'Javier', null))
+    const employeePerson = await asUser(adminId, () => createPerson(orgId, 'Empleado', null))
     await asUser(adminId, () =>
-      client.query('update people set user_id = $1 where id = $2', [managerUserId, manager.id]),
+      client.query('update people set user_id = $1 where id = $2', [employeeUserId, employeePerson.id]),
     )
-    await addMembership(orgId, managerUserId, 'manager')
-    const employee = await asUser(adminId, () => createPerson(orgId, 'Empleado', manager.id))
+    await addMembership(orgId, employeeUserId, 'employee')
 
-    const meeting = await asUser(managerUserId, async () => {
+    const meeting = await asUser(adminId, async () => {
       const { rows } = await client.query(
         `insert into one_on_ones (organization_id, person_id, manager_id, scheduled_at, created_by)
          values ($1, $2, $3, now(), $4) returning *`,
-        [orgId, employee.id, manager.id, managerUserId],
+        [orgId, employeePerson.id, adminPerson.id, adminId],
       )
       return rows[0]
     })
 
-    const visibleToManager = await asUser(managerUserId, async () => {
+    const visibleToEmployee = await asUser(employeeUserId, async () => {
       const { rows } = await client.query('select id from one_on_ones where id = $1', [meeting.id])
       return rows
     })
-    expect(visibleToManager).toHaveLength(1)
+    expect(visibleToEmployee).toHaveLength(1)
+
+    // El empleado no puede crear reuniones propias: solo admin gestiona el ciclo de vida del One2One.
+    await asUser(employeeUserId, async () => {
+      await expect(
+        client.query(
+          `insert into one_on_ones (organization_id, person_id, manager_id, scheduled_at, created_by)
+           values ($1, $2, $3, now(), $4)`,
+          [orgId, employeePerson.id, adminPerson.id, employeeUserId],
+        ),
+      ).rejects.toThrow(/row-level security/i)
+    })
 
     const visibleToOtherAdmin = await asUser(otherAdminId, async () => {
       const { rows } = await client.query('select id from one_on_ones where id = $1', [meeting.id])
@@ -99,50 +111,60 @@ describe.skipIf(!connectionString)('RLS de one_on_ones/actions (integración)', 
     expect(visibleToOtherAdmin).toHaveLength(0)
   })
 
-  it('los puntos de agenda heredan el alcance de la reunión', async () => {
+  it('los puntos de agenda heredan el alcance de la reunión; solo admin los gestiona', async () => {
     const adminId = await createUser('admin-agenda')
-    const managerUserId = await createUser('manager-agenda')
+    const employeeUserId = await createUser('employee-agenda')
     const orgId = await asUser(adminId, async () => {
       const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org Agenda'])
       return rows[0].id
     })
-    const manager = await asUser(adminId, () => createPerson(orgId, 'Manager2', null))
+    const adminPerson = await asUser(adminId, () => createPerson(orgId, 'Javier2', null))
+    const employeePerson = await asUser(adminId, () => createPerson(orgId, 'Empleado2', null))
     await asUser(adminId, () =>
-      client.query('update people set user_id = $1 where id = $2', [managerUserId, manager.id]),
+      client.query('update people set user_id = $1 where id = $2', [employeeUserId, employeePerson.id]),
     )
-    await addMembership(orgId, managerUserId, 'manager')
-    const employee = await asUser(adminId, () => createPerson(orgId, 'Empleado2', manager.id))
+    await addMembership(orgId, employeeUserId, 'employee')
 
-    const meeting = await asUser(managerUserId, async () => {
+    const meeting = await asUser(adminId, async () => {
       const { rows } = await client.query(
         `insert into one_on_ones (organization_id, person_id, manager_id, scheduled_at, created_by)
          values ($1, $2, $3, now(), $4) returning *`,
-        [orgId, employee.id, manager.id, managerUserId],
+        [orgId, employeePerson.id, adminPerson.id, adminId],
       )
       return rows[0]
     })
 
-    await asUser(managerUserId, () =>
+    await asUser(adminId, () =>
       client.query('insert into one_on_one_agenda_items (one_on_one_id, topic, position) values ($1, $2, 0)', [
         meeting.id,
         'Tema de prueba',
       ]),
     )
 
-    const items = await asUser(managerUserId, async () => {
+    const items = await asUser(employeeUserId, async () => {
       const { rows } = await client.query('select * from one_on_one_agenda_items where one_on_one_id = $1', [meeting.id])
       return rows
     })
-    expect(items).toHaveLength(1);
+    expect(items).toHaveLength(1)
 
-    // Un manager de otra organización, sin relación con esta reunión, no puede insertar en ella.
-    const otherManagerUserId = await createUser('other-manager-agenda')
-    const otherOrgId = await asUser(otherManagerUserId, async () => {
+    // El propio empleado no puede insertar puntos de agenda: sin policy para su rol.
+    await asUser(employeeUserId, async () => {
+      await expect(
+        client.query('insert into one_on_one_agenda_items (one_on_one_id, topic, position) values ($1, $2, 1)', [
+          meeting.id,
+          'Intento propio',
+        ]),
+      ).rejects.toThrow(/row-level security/i)
+    })
+
+    // Un admin de otra organización, sin relación con esta reunión, tampoco puede insertar en ella.
+    const otherAdminUserId = await createUser('other-admin-agenda')
+    const otherOrgId = await asUser(otherAdminUserId, async () => {
       const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org Agenda Other'])
       return rows[0].id
     })
     void otherOrgId
-    await asUser(otherManagerUserId, async () => {
+    await asUser(otherAdminUserId, async () => {
       await expect(
         client.query('insert into one_on_one_agenda_items (one_on_one_id, topic, position) values ($1, $2, 1)', [
           meeting.id,
@@ -158,13 +180,13 @@ describe.skipIf(!connectionString)('RLS de one_on_ones/actions (integración)', 
       const { rows } = await client.query('select bootstrap_organization($1) as id', ['Org NoDelete'])
       return rows[0].id
     })
-    const manager = await asUser(adminId, () => createPerson(orgId, 'Manager3', null))
-    const employee = await asUser(adminId, () => createPerson(orgId, 'Empleado3', manager.id))
+    const adminPerson = await asUser(adminId, () => createPerson(orgId, 'Javier3', null))
+    const employeePerson = await asUser(adminId, () => createPerson(orgId, 'Empleado3', null))
     const meeting = await asUser(adminId, async () => {
       const { rows } = await client.query(
         `insert into one_on_ones (organization_id, person_id, manager_id, scheduled_at, created_by)
          values ($1, $2, $3, now(), $4) returning *`,
-        [orgId, employee.id, manager.id, adminId],
+        [orgId, employeePerson.id, adminPerson.id, adminId],
       )
       return rows[0]
     })

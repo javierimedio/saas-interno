@@ -1,11 +1,6 @@
 import { calculateTenure, isSalaryReviewOverdue } from '../domain/person.rules'
 import type { SalaryRecordRow } from '../infrastructure/salary-records.repository'
 
-/**
- * docs/product-design/03-employee-profile.md §3.2 define seis chips en la barra de
- * "vitals". Esta iteración solo puede alimentar los que no dependen de 1:1/acciones/
- * objetivos (verticales futuras) — el resto llega cuando existan esos módulos.
- */
 export function PersonVitals({
   hireDate,
   terminationDate,
@@ -13,6 +8,10 @@ export function PersonVitals({
   nextMeetingAt,
   lastMeetingAt,
   lastMeetingRating,
+  openActionsCount,
+  overdueActionsCount,
+  activeGoalsCount,
+  atRiskGoalsCount,
   now,
 }: {
   hireDate: string
@@ -21,6 +20,10 @@ export function PersonVitals({
   nextMeetingAt?: string | null
   lastMeetingAt?: string | null
   lastMeetingRating?: number | null
+  openActionsCount?: number
+  overdueActionsCount?: number
+  activeGoalsCount?: number
+  atRiskGoalsCount?: number
   now: Date
 }) {
   const overdue = latestSalary ? isSalaryReviewOverdue(latestSalary.effective_date, now) : false
@@ -49,6 +52,16 @@ export function PersonVitals({
             : '—'
         }
         tone={overdue ? 'warn' : 'default'}
+      />
+      <VitalCard
+        label="Acciones"
+        value={`${openActionsCount ?? 0} abiertas${overdueActionsCount ? ` · ${overdueActionsCount} vencidas` : ''}`}
+        tone={overdueActionsCount ? 'bad' : 'default'}
+      />
+      <VitalCard
+        label="Objetivos"
+        value={`${activeGoalsCount ?? 0} activos${atRiskGoalsCount ? ` · ${atRiskGoalsCount} en riesgo` : ''}`}
+        tone={atRiskGoalsCount ? 'warn' : 'default'}
       />
     </div>
   )

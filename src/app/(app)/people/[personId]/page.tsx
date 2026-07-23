@@ -19,6 +19,15 @@ import { PrivateNotesPanel } from '@/features/people/ui/private-notes-panel'
 import { listMeetingsByPerson } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
 import { PersonMeetingsPanel } from '@/features/one-on-ones/ui/person-meetings-panel'
 import { listActionsByPerson } from '@/features/actions/infrastructure/actions.repository'
+import { PersonActionsPanel } from '@/features/actions/ui/person-actions-panel'
+import { isActionOverdue } from '@/features/actions/domain/action.rules'
+import { listManagerCandidates } from '@/features/people/infrastructure/people.repository'
+import { listGoalsByPerson, listCheckinsForGoals } from '@/features/development/infrastructure/goals.repository'
+import { listCompetencies, listPersonCompetencies } from '@/features/development/infrastructure/competencies.repository'
+import { listTrainingsByPerson } from '@/features/development/infrastructure/trainings.repository'
+import { listCareerPlansByPerson, listMilestones } from '@/features/development/infrastructure/career-plans.repository'
+import { listFeedbackByPerson, listEvaluationsByPerson } from '@/features/development/infrastructure/feedback-evaluations.repository'
+import { PersonDevelopmentSection } from '@/features/development/ui/person-development-section'
 
 export default async function PersonProfilePage({ params }: { params: Promise<{ personId: string }> }) {
   const { personId } = await params
@@ -29,7 +38,23 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
     notFound()
   }
 
-  const [departments, salaryRecords, documents, privateNotes, auditEvents, meetings, actions] = await Promise.all([
+  const [
+    departments,
+    salaryRecords,
+    documents,
+    privateNotes,
+    auditEvents,
+    meetings,
+    actions,
+    people,
+    goals,
+    competencies,
+    personCompetencies,
+    trainings,
+    careerPlans,
+    feedback,
+    evaluations,
+  ] = await Promise.all([
     listDepartments(supabase, person.organization_id),
     listSalaryRecords(supabase, person.id),
     listDocuments(supabase, person.id),
@@ -37,7 +62,33 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
     listAuditEventsForPerson(supabase, person.id),
     listMeetingsByPerson(supabase, person.id),
     listActionsByPerson(supabase, person.id),
+    listManagerCandidates(supabase, person.organization_id),
+    listGoalsByPerson(supabase, person.id),
+    listCompetencies(supabase, person.organization_id),
+    listPersonCompetencies(supabase, person.id),
+    listTrainingsByPerson(supabase, person.id),
+    listCareerPlansByPerson(supabase, person.id),
+    listFeedbackByPerson(supabase, person.id),
+    listEvaluationsByPerson(supabase, person.id),
   ])
+
+  const goalCheckins = await listCheckinsForGoals(supabase, goals.map((g) => g.id))
+  const checkinsByGoal = new Map<string, typeof goalCheckins>()
+  for (const c of goalCheckins) {
+    checkinsByGoal.set(c.goal_id, [...(checkinsByGoal.get(c.goal_id) ?? []), c])
+  }
+
+  const milestones = await listMilestones(supabase, careerPlans.map((c) => c.id))
+  const milestonesByPlan = new Map<string, typeof milestones>()
+  for (const m of milestones) {
+    milestonesByPlan.set(m.career_plan_id, [...(milestonesByPlan.get(m.career_plan_id) ?? []), m])
+  }
+
+  const now0 = new Date()
+  const openActionsCount = actions.filter((a) => a.status !== 'completed' && a.status !== 'cancelled').length
+  const overdueActionsCount = actions.filter((a) => isActionOverdue(a.due_date, a.status, now0)).length
+  const activeGoalsCount = goals.filter((g) => g.status !== 'completed' && g.status !== 'cancelled').length
+  const atRiskGoalsCount = goals.filter((g) => g.status === 'at_risk' || g.status === 'off_track').length
 
   let managerName: string | undefined
   if (person.manager_id) {
@@ -66,6 +117,10 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
         nextMeetingAt={upcoming?.scheduled_at}
         lastMeetingAt={lastCompleted?.actual_ended_at ?? lastCompleted?.scheduled_at}
         lastMeetingRating={lastCompleted?.overall_rating}
+        openActionsCount={openActionsCount}
+        overdueActionsCount={overdueActionsCount}
+        activeGoalsCount={activeGoalsCount}
+        atRiskGoalsCount={atRiskGoalsCount}
         now={now}
       />
 
@@ -85,6 +140,35 @@ export default async function PersonProfilePage({ params }: { params: Promise<{ 
             <PersonMeetingsPanel personId={person.id} meetings={meetings} />
           </CardContent>
         </Card>
+      </section>
+
+      <section id="acciones" className="scroll-mt-16">
+        <Card>
+          <CardHeader>
+            <CardTitle>Acciones</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <PersonActionsPanel actions={actions} />
+          </CardContent>
+        </Card>
+      </section>
+
+      <section id="desarrollo" className="scroll-mt-16">
+        <h2 className="mb-3 text-sm font-semibold">Desarrollo</h2>
+        <PersonDevelopmentSection
+          personId={person.id}
+          personName={`${person.first_name} ${person.last_name}`}
+          people={people}
+          goals={goals}
+          checkinsByGoal={checkinsByGoal}
+          competencies={competencies}
+          personCompetencies={personCompetencies}
+          trainings={trainings}
+          careerPlans={careerPlans}
+          milestonesByPlan={milestonesByPlan}
+          feedback={feedback}
+          evaluations={evaluations}
+        />
       </section>
 
       <section id="compensacion" className="scroll-mt-16">
