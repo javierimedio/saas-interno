@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils'
  * "Pronto" para no ocultar la visión completa del producto ni ofrecer enlaces rotos.
  */
 const NAV_ITEMS = [
-  { href: '/hoy', label: 'Hoy', icon: LayoutGrid, enabled: true },
+  { href: '/hoy', label: 'Dashboard', icon: LayoutGrid, enabled: true },
   { href: '/people', label: 'Personas', icon: Users, enabled: true },
   { href: '/one-on-ones', label: 'One2One', icon: Video, enabled: true },
   { href: '/actions', label: 'Acciones', icon: CheckSquare, enabled: true },

@@ -21,6 +21,21 @@ export async function listSalaryRecords(client: TypedClient, personId: string): 
   return data ?? []
 }
 
+/** Todo el histórico salarial de la organización, para agregados de dashboard (masa salarial, revisiones pendientes). */
+export async function listSalaryRecordsGlobal(client: TypedClient, organizationId: string): Promise<SalaryRecordRow[]> {
+  const { data, error } = await client
+    .from('salary_records')
+    .select('*')
+    .eq('organization_id', organizationId)
+    .order('effective_date', { ascending: false })
+
+  if (error) {
+    throw new Error(`No se pudo cargar el histórico salarial: ${error.message}`)
+  }
+
+  return data ?? []
+}
+
 export async function addSalaryRecord(
   client: TypedClient,
   organizationId: string,

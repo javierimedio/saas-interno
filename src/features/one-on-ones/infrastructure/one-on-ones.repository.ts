@@ -102,6 +102,23 @@ export async function listOverdueMeetings(
   return data ?? []
 }
 
+export async function listRecentlyCompletedMeetings(
+  client: TypedClient,
+  organizationId: string,
+  limit: number,
+): Promise<OneOnOneRow[]> {
+  const { data, error } = await client
+    .from('one_on_ones')
+    .select('*')
+    .eq('organization_id', organizationId)
+    .eq('status', 'completed')
+    .order('scheduled_at', { ascending: false })
+    .limit(limit)
+
+  if (error) throw new Error(`No se pudieron cargar los últimos 1:1: ${error.message}`)
+  return data ?? []
+}
+
 export async function listMeetingsByPerson(client: TypedClient, personId: string): Promise<OneOnOneRow[]> {
   const { data, error } = await client
     .from('one_on_ones')
