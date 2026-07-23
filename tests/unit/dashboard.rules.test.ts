@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  averageSalary,
   averageTenureYears,
   calculateAnnualPayroll,
   cumulativeSalaryIncrease,
@@ -9,6 +10,8 @@ import {
   groupActionsByUrgency,
   initialSalaryByPerson,
   latestSalaryByPerson,
+  latestWorkingHoursByPerson,
+  medianSalary,
   nextBirthdayDate,
   recentHires,
   salaryIncreaseByPerson,
@@ -199,5 +202,44 @@ describe('salaryIncreaseByPerson / cumulativeSalaryIncrease', () => {
     const increases = salaryIncreaseByPerson(people, latest, initial)
     expect(increases).toEqual([{ person: people[0], increase: 2000 }])
     expect(cumulativeSalaryIncrease(increases)).toBe(2000)
+  })
+})
+
+describe('averageSalary / medianSalary', () => {
+  it('calcula la media y la mediana del último salario de cada persona activa', () => {
+    const people = [person({ id: 'p1' }), person({ id: 'p2' }), person({ id: 'p3' })]
+    const latest = new Map([
+      ['p1', salaryRecord({ person_id: 'p1', gross_annual_salary: 20000 })],
+      ['p2', salaryRecord({ person_id: 'p2', gross_annual_salary: 30000 })],
+      ['p3', salaryRecord({ person_id: 'p3', gross_annual_salary: 40000 })],
+    ])
+    expect(averageSalary(people, latest as never)).toBe(30000)
+    expect(medianSalary(people, latest as never)).toBe(30000)
+  })
+
+  it('promedia entre los dos centrales cuando hay un número par de salarios', () => {
+    const people = [person({ id: 'p1' }), person({ id: 'p2' })]
+    const latest = new Map([
+      ['p1', salaryRecord({ person_id: 'p1', gross_annual_salary: 20000 })],
+      ['p2', salaryRecord({ person_id: 'p2', gross_annual_salary: 30000 })],
+    ])
+    expect(medianSalary(people, latest as never)).toBe(25000)
+  })
+
+  it('devuelve 0 cuando nadie tiene salario registrado', () => {
+    const people = [person({ id: 'p1' })]
+    expect(averageSalary(people, new Map())).toBe(0)
+    expect(medianSalary(people, new Map())).toBe(0)
+  })
+})
+
+describe('latestWorkingHoursByPerson', () => {
+  it('se queda con el registro más reciente por persona', () => {
+    const records = [
+      { id: 'w1', person_id: 'p1', effective_date: '2018-02-22', weekly_hours: 40 },
+      { id: 'w2', person_id: 'p1', effective_date: '2026-09-07', weekly_hours: 30 },
+    ] as never
+    const map = latestWorkingHoursByPerson(records)
+    expect(map.get('p1')?.weekly_hours).toBe(30)
   })
 })

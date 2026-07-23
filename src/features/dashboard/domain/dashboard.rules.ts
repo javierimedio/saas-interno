@@ -1,6 +1,7 @@
 import { isSalaryReviewOverdue } from '@/features/people/domain/person.rules'
 import type { PersonRow } from '@/features/people/infrastructure/people.repository'
 import type { SalaryRecordRow } from '@/features/people/infrastructure/salary-records.repository'
+import type { WorkingHoursRecordRow } from '@/features/people/infrastructure/working-hours-records.repository'
 import type { ActionRow } from '@/features/actions/infrastructure/actions.repository'
 
 function stripTime(date: Date): Date {
@@ -30,6 +31,40 @@ export function calculateAnnualPayroll(activePeople: PersonRow[], latestByPerson
     const latest = latestByPerson.get(person.id)
     return total + (latest ? Number(latest.gross_annual_salary) : 0)
   }, 0)
+}
+
+function currentSalaries(activePeople: PersonRow[], latestByPerson: Map<string, SalaryRecordRow>): number[] {
+  return activePeople
+    .map((person) => latestByPerson.get(person.id))
+    .filter((record): record is SalaryRecordRow => !!record)
+    .map((record) => Number(record.gross_annual_salary))
+}
+
+/** Salario medio del equipo activo (último registro vigente de cada persona). */
+export function averageSalary(activePeople: PersonRow[], latestByPerson: Map<string, SalaryRecordRow>): number {
+  const salaries = currentSalaries(activePeople, latestByPerson)
+  if (salaries.length === 0) return 0
+  return salaries.reduce((sum, s) => sum + s, 0) / salaries.length
+}
+
+/** Mediana salarial del equipo activo. */
+export function medianSalary(activePeople: PersonRow[], latestByPerson: Map<string, SalaryRecordRow>): number {
+  const salaries = currentSalaries(activePeople, latestByPerson).sort((a, b) => a - b)
+  if (salaries.length === 0) return 0
+  const mid = Math.floor(salaries.length / 2)
+  return salaries.length % 2 !== 0 ? salaries[mid] : (salaries[mid - 1] + salaries[mid]) / 2
+}
+
+/** Última fila de working_hours_records por persona (misma lógica que latestSalaryByPerson). */
+export function latestWorkingHoursByPerson(records: WorkingHoursRecordRow[]): Map<string, WorkingHoursRecordRow> {
+  const map = new Map<string, WorkingHoursRecordRow>()
+  for (const record of records) {
+    const existing = map.get(record.person_id)
+    if (!existing || record.effective_date > existing.effective_date) {
+      map.set(record.person_id, record)
+    }
+  }
+  return map
 }
 
 /** Antigüedad media en años (decimal) de las personas activas. */

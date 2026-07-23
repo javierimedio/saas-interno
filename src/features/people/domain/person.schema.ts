@@ -118,10 +118,22 @@ export const documentMetadataSchema = z.object({
 })
 export type DocumentMetadataInput = z.infer<typeof documentMetadataSchema>
 
+export const PEOPLE_SORT_BY = ['name', 'salary', 'lastReview', 'workingHours', 'tenure', 'department', 'manager'] as const
+export const PEOPLE_SORT_DIR = ['asc', 'desc'] as const
+export const JORNADA_FILTER = ['completa', 'reducida'] as const
+
 export const peopleListFiltersSchema = z.object({
   q: z.string().trim().optional(),
   departmentId: z.string().uuid().optional(),
   status: z.enum(EMPLOYMENT_STATUS).optional(),
+  managerId: z.string().uuid().optional(),
+  minSalary: z.coerce.number().positive().optional(),
+  maxSalary: z.coerce.number().positive().optional(),
+  jornada: z.enum(JORNADA_FILTER).optional(),
+  minTenureYears: z.coerce.number().min(0).optional(),
+  maxTenureYears: z.coerce.number().min(0).optional(),
+  sortBy: z.enum(PEOPLE_SORT_BY).default('name'),
+  sortDir: z.enum(PEOPLE_SORT_DIR).default('asc'),
   page: z.coerce.number().int().min(1).default(1),
 })
 export type PeopleListFilters = z.infer<typeof peopleListFiltersSchema>

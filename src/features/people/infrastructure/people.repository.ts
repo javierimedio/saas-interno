@@ -1,59 +1,10 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/shared/infrastructure/supabase/database.types'
-import type { CreatePersonInput, PeopleListFilters, UpdatePersonInput } from '../domain/person.schema'
+import type { CreatePersonInput, UpdatePersonInput } from '../domain/person.schema'
 
 type TypedClient = SupabaseClient<Database>
 export type PersonRow = Database['public']['Tables']['people']['Row']
-
-export const PAGE_SIZE = 20
-
-export type PeopleListResult = {
-  people: PersonRow[]
-  total: number
-  page: number
-  pageSize: number
-}
-
-export async function listPeople(
-  client: TypedClient,
-  organizationId: string,
-  filters: PeopleListFilters,
-): Promise<PeopleListResult> {
-  const page = filters.page ?? 1
-  const from = (page - 1) * PAGE_SIZE
-  const to = from + PAGE_SIZE - 1
-
-  let query = client
-    .from('people')
-    .select('*', { count: 'exact' })
-    .eq('organization_id', organizationId)
-    .order('first_name', { ascending: true })
-    .range(from, to)
-
-  if (filters.q) {
-    const term = filters.q.replace(/[%_]/g, '')
-    query = query.or(
-      `first_name.ilike.%${term}%,last_name.ilike.%${term}%,email.ilike.%${term}%,position_title.ilike.%${term}%,employee_code.ilike.%${term}%`,
-    )
-  }
-
-  if (filters.departmentId) {
-    query = query.eq('department_id', filters.departmentId)
-  }
-
-  if (filters.status) {
-    query = query.eq('employment_status', filters.status)
-  }
-
-  const { data, error, count } = await query
-
-  if (error) {
-    throw new Error(`No se pudo cargar el listado de personas: ${error.message}`)
-  }
-
-  return { people: data ?? [], total: count ?? 0, page, pageSize: PAGE_SIZE }
-}
 
 export async function getPersonById(client: TypedClient, id: string): Promise<PersonRow | null> {
   const { data, error } = await client.from('people').select('*').eq('id', id).maybeSingle()

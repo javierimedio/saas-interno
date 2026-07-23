@@ -16,6 +16,7 @@ import {
 } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
 import { listActionsGlobal } from '@/features/actions/infrastructure/actions.repository'
 import {
+  averageSalary,
   averageTenureYears,
   calculateAnnualPayroll,
   cumulativeSalaryIncrease,
@@ -24,6 +25,7 @@ import {
   groupActionsByUrgency,
   initialSalaryByPerson,
   latestSalaryByPerson,
+  medianSalary,
   recentHires,
   salaryIncreaseByPerson,
   upcomingBirthdays,
@@ -66,6 +68,8 @@ export default async function DashboardPage() {
 
   const latestByPerson = latestSalaryByPerson(salaryRecords)
   const annualPayroll = calculateAnnualPayroll(activePeople, latestByPerson)
+  const avgSalary = averageSalary(activePeople, latestByPerson)
+  const medSalary = medianSalary(activePeople, latestByPerson)
   const avgTenure = averageTenureYears(activePeople, now)
   const openActions = actions.filter((a) => a.status !== 'completed' && a.status !== 'cancelled')
   const { overdue: overdueActions, dueToday: todayActions, dueThisWeek: weekActions } = groupActionsByUrgency(actions, now)
@@ -92,9 +96,11 @@ export default async function DashboardPage() {
 
       <section className="flex flex-col gap-3">
         <p className="text-nexo-label">Indicadores clave</p>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           <StatCard label="Personas activas" value={String(activePeople.length)} />
           <StatCard label="Masa salarial anual" value={formatCurrency(annualPayroll)} />
+          <StatCard label="Salario medio" value={formatCurrency(avgSalary)} />
+          <StatCard label="Mediana salarial" value={formatCurrency(medSalary)} />
           <StatCard label="Antigüedad media" value={`${avgTenure.toFixed(1)} años`} />
           <StatCard
             label="Acciones pendientes"

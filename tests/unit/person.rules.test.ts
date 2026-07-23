@@ -6,6 +6,8 @@ import {
   fullName,
   initials,
   isSalaryReviewOverdue,
+  salaryReviewRecency,
+  tenureInMonths,
   workingHoursLabel,
 } from '@/features/people/domain/person.rules'
 
@@ -38,6 +40,31 @@ describe('calculateTenure', () => {
 
   it('no da antigüedad negativa si aún no se ha cumplido el día del mes', () => {
     expect(calculateTenure('2026-07-20', new Date('2026-07-22'))).toBe('0m')
+  })
+})
+
+describe('tenureInMonths', () => {
+  it('coincide con calculateTenure en meses totales', () => {
+    expect(tenureInMonths('2023-01-01', new Date('2026-07-22'))).toBe(42) // 3a 6m
+    expect(tenureInMonths('2026-07-20', new Date('2026-07-22'))).toBe(0)
+  })
+
+  it('usa la fecha de baja en vez de la fecha de referencia si existe', () => {
+    expect(tenureInMonths('2023-01-01', new Date('2026-07-22'), '2024-01-01')).toBe(12)
+  })
+})
+
+describe('salaryReviewRecency', () => {
+  it('es "recent" cuando la revisión tiene menos de 12 meses', () => {
+    expect(salaryReviewRecency('2026-01-01', new Date('2026-07-22'))).toBe('recent')
+  })
+
+  it('es "over_12" entre 12 y 18 meses', () => {
+    expect(salaryReviewRecency('2025-06-01', new Date('2026-07-22'))).toBe('over_12')
+  })
+
+  it('es "over_18" a partir de 18 meses', () => {
+    expect(salaryReviewRecency('2024-01-01', new Date('2026-07-22'))).toBe('over_18')
   })
 })
 

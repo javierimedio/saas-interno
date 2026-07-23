@@ -12,8 +12,8 @@ export function initials(person: { firstName: string; lastName: string }): strin
   return `${person.firstName[0] ?? ''}${person.lastName[0] ?? ''}`.toUpperCase()
 }
 
-/** Antigüedad en años y meses completos entre la fecha de alta y hoy (o la baja). */
-export function calculateTenure(hireDate: string, referenceDate: Date, terminationDate?: string | null): string {
+/** Antigüedad en meses completos entre la fecha de alta y hoy (o la baja) — para ordenar/filtrar. */
+export function tenureInMonths(hireDate: string, referenceDate: Date, terminationDate?: string | null): number {
   const start = new Date(hireDate)
   const end = terminationDate ? new Date(terminationDate) : referenceDate
 
@@ -21,8 +21,12 @@ export function calculateTenure(hireDate: string, referenceDate: Date, terminati
   if (end.getDate() < start.getDate()) {
     months -= 1
   }
-  months = Math.max(0, months)
+  return Math.max(0, months)
+}
 
+/** Antigüedad en años y meses completos entre la fecha de alta y hoy (o la baja). */
+export function calculateTenure(hireDate: string, referenceDate: Date, terminationDate?: string | null): string {
+  const months = tenureInMonths(hireDate, referenceDate, terminationDate)
   const years = Math.floor(months / 12)
   const remainingMonths = months % 12
 
@@ -50,6 +54,17 @@ export function isSalaryReviewOverdue(
 
 export function isPersonActive(employmentStatus: string): boolean {
   return employmentStatus === 'active'
+}
+
+export type SalaryReviewRecency = 'recent' | 'over_12' | 'over_18'
+
+/** Clasifica la última revisión salarial para el listado de personas (docs/product-design/04-dashboard.md §4.3). */
+export function salaryReviewRecency(lastReviewDate: string, referenceDate: Date): SalaryReviewRecency {
+  const last = new Date(lastReviewDate)
+  const monthsSince = (referenceDate.getFullYear() - last.getFullYear()) * 12 + (referenceDate.getMonth() - last.getMonth())
+  if (monthsSince >= 18) return 'over_18'
+  if (monthsSince >= 12) return 'over_12'
+  return 'recent'
 }
 
 /** Edad en años cumplidos a partir de la fecha de nacimiento. Nunca se almacena, se calcula al vuelo. */
