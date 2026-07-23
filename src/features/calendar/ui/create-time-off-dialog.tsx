@@ -45,7 +45,7 @@ export function CreateTimeOffDialog({ people }: { people: Pick<PersonRow, 'id' |
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <Plus />
           Ausencia
         </Button>

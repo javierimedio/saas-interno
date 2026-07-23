@@ -32,12 +32,12 @@ export function PersonVitals({
     <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
       <VitalCard label="Antigüedad" value={calculateTenure(hireDate, now, terminationDate)} />
       <VitalCard
-        label="Próximo 1:1"
+        label="Próximo One2One"
         value={nextMeetingAt ? new Date(nextMeetingAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }) : 'Sin programar'}
         tone={nextMeetingAt ? 'default' : 'warn'}
       />
       <VitalCard
-        label="Último 1:1"
+        label="Último One2One"
         value={
           lastMeetingAt
             ? `${new Date(lastMeetingAt).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}${lastMeetingRating ? ` · ${lastMeetingRating}/5` : ''}`

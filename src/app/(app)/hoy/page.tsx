@@ -64,9 +64,9 @@ export default async function DashboardPage() {
   const futureHiresList = futureHires(people, now)
 
   return (
-    <div className="mx-auto flex max-w-[1360px] flex-col gap-8 p-8">
+    <div className="flex flex-col gap-5 p-6">
       <div>
-        <h1 className="text-nexo-title">Dashboard</h1>
+        <h1 className="text-nexo-title">Inicio</h1>
         <p className="text-nexo-subtitle mt-0.5 text-[13px] capitalize">
           {now.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })}
         </p>
@@ -89,8 +89,7 @@ export default async function DashboardPage() {
 
       <section className="flex flex-col gap-3">
         <p className="text-nexo-label">Indicadores rápidos</p>
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-          <StatCard label="Empleados activos" value={String(activePeople.length)} />
+        <div className="grid grid-cols-3 gap-4">
           <StatCard label="Empleados de baja" value={String(offboardedPeople.length)} />
           <StatCard label="Incorporaciones futuras" value={String(futureHiresList.length)} />
           <StatCard label="Excedencias" value={String(onLeavePeople.length)} />

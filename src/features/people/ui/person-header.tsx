@@ -1,5 +1,6 @@
 import Link from 'next/link'
-import { Pencil } from 'lucide-react'
+import { Cake, CalendarDays, Hourglass, IdCard, Mail, Pencil, Wallet } from 'lucide-react'
+import type { LucideIcon } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
@@ -15,11 +16,14 @@ function formatCurrency(amount: number, currency: string): string {
   return new Intl.NumberFormat('es-ES', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount)
 }
 
-function Field({ label, value }: { label: string; value: string }) {
+function Field({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) {
   return (
-    <div>
-      <p className="text-nexo-label">{label}</p>
-      <p className="mt-0.5 text-[13px] font-semibold text-foreground">{value}</p>
+    <div className="flex min-w-0 items-start gap-2.5">
+      <Icon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden />
+      <div className="min-w-0">
+        <p className="text-nexo-label">{label}</p>
+        <p className="mt-0.5 break-words text-[13px] font-semibold text-foreground">{value}</p>
+      </div>
     </div>
   )
 }
@@ -71,16 +75,18 @@ export function PersonHeader({
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 border-t border-border px-6 py-4 sm:grid-cols-4">
-        <Field label="Código de empleado" value={person.employee_code ?? '—'} />
-        <Field label="Fecha incorporación" value={new Date(person.hire_date).toLocaleDateString('es-ES')} />
-        <Field label="Antigüedad" value={calculateTenure(person.hire_date, now, person.termination_date)} />
+      <div className="grid grid-cols-1 gap-x-6 gap-y-4 border-t border-border px-6 py-5 sm:grid-cols-2 lg:grid-cols-3">
+        <Field icon={IdCard} label="Código de empleado" value={person.employee_code ?? '—'} />
+        <Field icon={CalendarDays} label="Fecha incorporación" value={new Date(person.hire_date).toLocaleDateString('es-ES')} />
+        <Field icon={Hourglass} label="Antigüedad" value={calculateTenure(person.hire_date, now, person.termination_date)} />
         <Field
+          icon={Wallet}
           label="Salario"
           value={latestSalary ? formatCurrency(Number(latestSalary.gross_annual_salary), latestSalary.currency) : '—'}
         />
-        <Field label="Email" value={person.email} />
+        <Field icon={Mail} label="Email" value={person.email} />
         <Field
+          icon={Cake}
           label="Fecha de nacimiento"
           value={
             person.birth_date

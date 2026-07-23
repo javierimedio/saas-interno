@@ -70,7 +70,7 @@ function eventFromMeeting(row: OneOnOneRow): PersonTimelineEvent | null {
     id: row.id,
     type: 'one_on_one',
     occurredAt: row.actual_ended_at,
-    title: '1:1 realizado',
+    title: 'One2One realizado',
     detail: row.overall_rating ? `Valoración ${row.overall_rating}/5` : undefined,
   }
 }

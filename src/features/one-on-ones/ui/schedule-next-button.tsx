@@ -21,7 +21,7 @@ export function ScheduleNextButton({ meetingId }: { meetingId: string }) {
       return
     }
 
-    toast.success('Siguiente 1:1 programado')
+    toast.success('Siguiente One2One programado')
     router.push(`/one-on-ones/${result.data.id}`)
   }
 

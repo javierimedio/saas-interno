@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { Plus } from 'lucide-react'
 import { z } from 'zod'
 
 import { Button } from '@/components/ui/button'
@@ -102,7 +103,8 @@ function AddSalaryRecordDialog({ personId }: { personId: string }) {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm">
-          + Añadir revisión
+          <Plus />
+          Añadir revisión
         </Button>
       </DialogTrigger>
       <DialogContent>

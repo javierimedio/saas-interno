@@ -51,7 +51,7 @@ export default async function OneOnOnesPage({
         <Button asChild>
           <Link href="/one-on-ones/new">
             <Plus />
-            Programar 1:1
+            Programar One2One
           </Link>
         </Button>
       </div>

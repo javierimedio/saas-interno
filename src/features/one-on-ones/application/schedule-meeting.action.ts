@@ -23,7 +23,7 @@ export async function scheduleMeetingAction(input: ScheduleOneOnOneInput): Promi
     return err('Persona no encontrada')
   }
   if (!person.manager_id) {
-    return err('Esta persona no tiene un responsable asignado — asígnalo antes de programar un 1:1')
+    return err('Esta persona no tiene un responsable asignado — asígnalo antes de programar un One2One')
   }
 
   try {

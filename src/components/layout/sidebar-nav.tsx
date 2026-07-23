@@ -29,7 +29,7 @@ import { cn } from '@/lib/utils'
  * con la cabecera que pedía el rediseño.
  */
 const ADMIN_NAV_ITEMS = [
-  { href: '/hoy', label: 'Dashboard', icon: LayoutGrid },
+  { href: '/hoy', label: 'Inicio', icon: LayoutGrid },
   { href: '/people', label: 'Personas', icon: Users },
   { href: '/one-on-ones', label: 'One2One', icon: Video },
   { href: '/actions', label: 'Acciones', icon: CheckSquare },
@@ -85,7 +85,7 @@ export function SidebarNav({
       </nav>
       {isAdmin ? (
         <div className="mt-auto border-t border-white/10 pt-2">
-          <NavLink href="/settings" label="Ajustes" Icon={Settings} isActive={pathname.startsWith('/settings')} />
+          <NavLink href="/settings" label="Configuración" Icon={Settings} isActive={pathname.startsWith('/settings')} />
         </div>
       ) : null}
     </aside>

@@ -22,6 +22,7 @@ export function PeriodEventsPanel({
   const router = useRouter()
 
   async function handleDeleteTimeOff(id: string) {
+    if (!window.confirm('¿Eliminar esta ausencia?')) return
     const result = await deleteTimeOffAction(id)
     if (!result.ok) {
       toast.error(result.error)
@@ -31,6 +32,7 @@ export function PeriodEventsPanel({
   }
 
   async function handleDeleteHoliday(id: string) {
+    if (!window.confirm('¿Eliminar este festivo?')) return
     const result = await deleteHolidayAction(id)
     if (!result.ok) {
       toast.error(result.error)

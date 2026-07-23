@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Bell, LogOut } from 'lucide-react'
+import { LogOut } from 'lucide-react'
 
 import { Avatar } from '@/components/ui/avatar'
 import {
@@ -12,9 +12,19 @@ import {
 } from '@/components/ui/dropdown-menu'
 import { BRAND } from '@/lib/brand'
 import { signOutAction } from '@/features/auth/application/sign-in.action'
+import { NotificationsBell } from '@/features/notifications/ui/notifications-bell'
+import type { AppNotification } from '@/features/notifications/domain/notification.rules'
 import { ThemeToggle } from './theme-toggle'
 
-export function Topbar({ organizationName, email }: { organizationName: string; email: string }) {
+export function Topbar({
+  organizationName,
+  email,
+  notifications,
+}: {
+  organizationName: string
+  email: string
+  notifications: AppNotification[]
+}) {
   return (
     <header className="flex h-14 shrink-0 items-center gap-3.5 bg-brand-chrome px-5 text-brand-chrome-foreground">
       <Image src={BRAND.logoWhiteUrl} alt={BRAND.name} width={140} height={28} className="h-7 w-auto object-contain" priority />
@@ -37,15 +47,7 @@ export function Topbar({ organizationName, email }: { organizationName: string; 
       <div className="ml-auto flex items-center gap-1">
         <span className="mr-2 hidden text-[12px] text-white/60 md:inline">{organizationName}</span>
         <ThemeToggle onDark />
-        <button
-          type="button"
-          disabled
-          aria-label="Notificaciones (próximamente)"
-          title="Notificaciones — próximamente"
-          className="relative flex size-9 cursor-not-allowed items-center justify-center rounded-md text-white/40 outline-none"
-        >
-          <Bell className="size-4" />
-        </button>
+        <NotificationsBell notifications={notifications} userKey={email} />
         <DropdownMenu>
           <DropdownMenuTrigger className="ml-1 flex items-center gap-2 rounded-md px-1.5 py-1 outline-none transition-colors hover:bg-white/10 focus-visible:ring-2 focus-visible:ring-white/40">
             <Avatar name={email} size="sm" className="bg-white/15 text-white" />

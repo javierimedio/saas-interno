@@ -45,6 +45,7 @@ export function AgendaList({
   }
 
   async function handleRemove(item: AgendaItemRow) {
+    if (!window.confirm(`¿Eliminar el punto de agenda "${item.topic}"?`)) return
     const result = await removeAgendaItemAction({ id: item.id }, oneOnOneId)
     if (!result.ok) toast.error(result.error)
     router.refresh()

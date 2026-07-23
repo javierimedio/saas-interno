@@ -13,13 +13,13 @@ export function PersonMeetingsPanel({ personId, meetings }: { personId: string; 
         <Button asChild variant="outline" size="sm">
           <Link href={`/one-on-ones/new?personId=${personId}`}>
             <Plus />
-            Programar 1:1
+            Programar One2One
           </Link>
         </Button>
       </div>
 
       {meetings.length === 0 ? (
-        <EmptyState title="Aún no hay 1:1 con esta persona" />
+        <EmptyState title="Aún no hay One2One con esta persona" />
       ) : (
         <div className="flex flex-col divide-y divide-border">
           {meetings.map((meeting) => (

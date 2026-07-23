@@ -81,7 +81,7 @@ export async function listUpcomingMeetings(
     .order('scheduled_at', { ascending: true })
     .limit(limit)
 
-  if (error) throw new Error(`No se pudieron cargar los próximos 1:1: ${error.message}`)
+  if (error) throw new Error(`No se pudieron cargar los próximos One2One: ${error.message}`)
   return data ?? []
 }
 
@@ -98,7 +98,7 @@ export async function listOverdueMeetings(
     .lt('scheduled_at', nowIso)
     .order('scheduled_at', { ascending: true })
 
-  if (error) throw new Error(`No se pudieron cargar los 1:1 pendientes: ${error.message}`)
+  if (error) throw new Error(`No se pudieron cargar los One2One pendientes: ${error.message}`)
   return data ?? []
 }
 
@@ -115,7 +115,7 @@ export async function listRecentlyCompletedMeetings(
     .order('scheduled_at', { ascending: false })
     .limit(limit)
 
-  if (error) throw new Error(`No se pudieron cargar los últimos 1:1: ${error.message}`)
+  if (error) throw new Error(`No se pudieron cargar los últimos One2One: ${error.message}`)
   return data ?? []
 }
 
@@ -126,7 +126,7 @@ export async function listMeetingsByPerson(client: TypedClient, personId: string
     .eq('person_id', personId)
     .order('scheduled_at', { ascending: false })
 
-  if (error) throw new Error(`No se pudieron cargar los 1:1 de la persona: ${error.message}`)
+  if (error) throw new Error(`No se pudieron cargar los One2One de la persona: ${error.message}`)
   return data ?? []
 }
 

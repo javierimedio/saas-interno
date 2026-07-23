@@ -56,6 +56,7 @@ export function DocumentsPanel({ personId, documents }: { personId: string; docu
   }
 
   async function handleDelete(document: DocumentRow) {
+    if (!window.confirm(`¿Eliminar "${document.file_name}"? Esta acción no se puede deshacer.`)) return
     const result = await deleteDocumentAction(document)
     if (!result.ok) {
       toast.error(result.error)

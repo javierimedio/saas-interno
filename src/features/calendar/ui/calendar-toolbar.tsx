@@ -46,8 +46,10 @@ export function CalendarToolbar({ view, date, title }: { view: CalendarView; dat
             key={v.value}
             href={href(v.value, date)}
             className={cn(
-              'rounded px-3 py-1 text-xs font-semibold',
-              v.value === view ? 'bg-primary text-primary-foreground' : 'text-muted-foreground',
+              'rounded px-3 py-1 text-xs font-semibold outline-none transition-colors',
+              v.value === view
+                ? 'bg-primary text-primary-foreground'
+                : 'text-muted-foreground hover:bg-secondary hover:text-foreground focus-visible:ring-2 focus-visible:ring-ring',
             )}
           >
             {v.label}

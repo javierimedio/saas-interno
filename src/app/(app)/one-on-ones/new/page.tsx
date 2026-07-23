@@ -10,7 +10,7 @@ export default async function NewMeetingPage() {
 
   return (
     <div className="flex flex-col gap-5 p-6">
-      <h1 className="text-nexo-title">Programar 1:1</h1>
+      <h1 className="text-nexo-title">Programar One2One</h1>
       <ScheduleMeetingForm people={people} />
     </div>
   )

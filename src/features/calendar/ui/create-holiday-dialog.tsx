@@ -41,7 +41,7 @@ export function CreateHolidayDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="outline">
+        <Button>
           <Plus />
           Festivo
         </Button>

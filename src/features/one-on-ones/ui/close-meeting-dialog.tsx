@@ -54,7 +54,7 @@ export function CloseMeetingDialog({ meetingId }: { meetingId: string }) {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Cerrar 1:1</DialogTitle>
+          <DialogTitle>Cerrar One2One</DialogTitle>
         </DialogHeader>
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
