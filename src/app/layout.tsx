@@ -9,7 +9,7 @@ import './globals.css'
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
 
 export const metadata: Metadata = {
-  title: 'Nexo · GOR FACTORY',
+  title: 'Nexo | GOR FACTORY',
   description: 'Gestión de personas y One2One — GOR FACTORY',
   icons: {
     icon: BRAND.logoWhiteUrl,
