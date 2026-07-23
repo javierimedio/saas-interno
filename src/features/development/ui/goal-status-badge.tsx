@@ -8,7 +8,7 @@ const VARIANT: Record<GoalStatus, 'success' | 'neutral' | 'outline' | 'danger' |
   on_track: 'success',
   at_risk: 'warning',
   off_track: 'danger',
-  completed: 'accent',
+  completed: 'success',
   cancelled: 'neutral',
 }
 

@@ -113,7 +113,7 @@ export default async function DashboardPage() {
 
       <section className="flex flex-col gap-3">
         <p className="text-nexo-label">Indicadores rápidos</p>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
           <StatCard label="Empleados de baja" value={String(offboardedPeople.length)} />
           <StatCard label="Incorporaciones futuras" value={String(futureHiresList.length)} />
           <StatCard label="Excedencias" value={String(onLeavePeople.length)} />

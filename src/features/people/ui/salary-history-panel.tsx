@@ -34,6 +34,10 @@ const REASON_LABELS: Record<string, string> = {
   correction: 'Corrección',
 }
 
+function formatCurrency(amount: number, currency: string): string {
+  return new Intl.NumberFormat('es-ES', { style: 'currency', currency, maximumFractionDigits: 0 }).format(amount)
+}
+
 export function SalaryHistoryPanel({ personId, records }: { personId: string; records: SalaryRecordRow[] }) {
   return (
     <div className="flex flex-col gap-3">
@@ -57,9 +61,7 @@ export function SalaryHistoryPanel({ personId, records }: { personId: string; re
                 </p>
                 {record.notes ? <p className="text-muted-foreground">{record.notes}</p> : null}
               </div>
-              <p className="tabular-nums font-semibold">
-                {record.gross_annual_salary.toLocaleString('es-ES')} {record.currency}
-              </p>
+              <p className="tabular-nums font-semibold">{formatCurrency(record.gross_annual_salary, record.currency)}</p>
             </div>
           ))}
         </div>

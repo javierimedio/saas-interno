@@ -15,7 +15,7 @@ export function MeetingsTable({
   peopleNamesById: Map<string, string>
 }) {
   if (meetings.length === 0) {
-    return <EmptyState title="No hay reuniones que coincidan con los filtros" />
+    return <EmptyState title="Sin reuniones que coincidan con los filtros" />
   }
 
   return (

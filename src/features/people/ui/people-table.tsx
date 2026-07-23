@@ -33,7 +33,7 @@ export function PeopleTable({ rows, now, userKey }: { rows: PersonListRow[]; now
 
       {rows.length === 0 ? (
         <EmptyState
-          title="No hay personas que coincidan con los filtros"
+          title="Sin personas que coincidan con los filtros"
           description="Prueba a cambiar la búsqueda o los filtros aplicados."
         />
       ) : (
