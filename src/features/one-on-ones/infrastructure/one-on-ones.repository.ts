@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 
 import type { Database } from '@/shared/infrastructure/supabase/database.types'
 import type {
+  BlockData,
   CloseOneOnOneInput,
   MeetingData,
   MeetingListFilters,
@@ -10,6 +11,7 @@ import type {
   UpdateNextMeetingInput,
   UpdateOneOnOneInput,
 } from '../domain/one-on-one.schema'
+import { meetingDataSchema } from '../domain/one-on-one.schema'
 import { resolveTemplateBlocks, type NarrativeBlockKey } from '../domain/one-on-one-templates'
 
 type TypedClient = SupabaseClient<Database>
@@ -172,9 +174,23 @@ export async function scheduleMeeting(
   return data
 }
 
-/** "Guardar borrador": persiste el contenido narrativo completo (los bloques), tal cual lo tiene el cliente. */
-export async function updateMeetingData(client: TypedClient, id: string, meetingData: MeetingData): Promise<OneOnOneRow> {
-  const { data, error } = await client.from('one_on_ones').update({ meeting_data: meetingData }).eq('id', id).select('*').single()
+/**
+ * "Guardar borrador": fusiona los bloques indicados con el meeting_data actual en el servidor (no con
+ * la copia que tenga el cliente en memoria), para que guardar un bloque nunca pise lo que otro bloque
+ * haya guardado mientras tanto.
+ */
+export async function updateMeetingData(
+  client: TypedClient,
+  id: string,
+  blocksPatch: Record<string, BlockData>,
+): Promise<OneOnOneRow> {
+  const current = await getMeetingById(client, id)
+  if (!current) throw new Error('No se encontró la reunión')
+
+  const currentData = meetingDataSchema.parse(current.meeting_data)
+  const nextData: MeetingData = { version: 1, blocks: { ...currentData.blocks, ...blocksPatch } }
+
+  const { data, error } = await client.from('one_on_ones').update({ meeting_data: nextData }).eq('id', id).select('*').single()
 
   if (error) throw new Error(`No se pudo guardar el borrador: ${error.message}`)
   return data

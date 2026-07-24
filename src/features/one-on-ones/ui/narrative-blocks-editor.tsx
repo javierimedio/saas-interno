@@ -28,7 +28,9 @@ export function NarrativeBlocksEditor({
   readOnly?: boolean
 }) {
   const router = useRouter()
-  const [blocks, setBlocks] = React.useState(initialMeetingData.blocks)
+  const [blocks, setBlocks] = React.useState<Record<string, BlockData>>(() =>
+    Object.fromEntries(blockKeys.map((key) => [key, initialMeetingData.blocks[key] ?? EMPTY_BLOCK])),
+  )
   const [isSaving, setIsSaving] = React.useState(false)
   const [dirty, setDirty] = React.useState(false)
 
@@ -53,7 +55,7 @@ export function NarrativeBlocksEditor({
 
   async function handleSave() {
     setIsSaving(true)
-    const result = await updateMeetingDataAction({ id: meetingId, meetingData: { version: 1, blocks } })
+    const result = await updateMeetingDataAction({ id: meetingId, blocksPatch: blocks })
     setIsSaving(false)
 
     if (!result.ok) {

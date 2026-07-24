@@ -117,7 +117,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ meetin
 
       <ActionPlanBlock
         meetingId={meeting.id}
-        meetingData={meetingData}
+        initialBlock={meetingData.blocks.action_plan}
         actions={actions}
         personId={person.id}
         managerId={manager.id}
@@ -131,6 +131,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ meetin
           meetingId={meeting.id}
           managerComments={meeting.manager_comments}
           employeeComments={meeting.employee_comments}
+          initialBlock={meetingData.blocks.feedback}
           readOnly={readOnly}
         />
       ) : null}
@@ -138,7 +139,7 @@ export default async function MeetingPage({ params }: { params: Promise<{ meetin
       <NextMeetingBlock
         meetingId={meeting.id}
         nextMeetingSuggestedAt={meeting.next_meeting_suggested_at}
-        meetingData={meetingData}
+        initialBlock={meetingData.blocks.next_meeting}
         readOnly={readOnly}
       />
 

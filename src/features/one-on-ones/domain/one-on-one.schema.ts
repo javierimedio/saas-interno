@@ -47,7 +47,10 @@ export type UpdateOneOnOneInput = z.infer<typeof updateOneOnOneSchema>
 export const closeOneOnOneSchema = z.object({
   id: uuid,
   managerComments: z.string().trim().max(4000).optional(),
-  overallRating: z.coerce.number().int().min(1).max(5).optional(),
+  overallRating: z.preprocess(
+    (value) => (value === '' || value === undefined ? undefined : value),
+    z.coerce.number().int().min(1).max(5).optional(),
+  ),
   nextMeetingSuggestedAt: z.string().optional(),
 })
 export type CloseOneOnOneInput = z.infer<typeof closeOneOnOneSchema>
@@ -95,9 +98,11 @@ export const meetingDataSchema = z.object({
 })
 export type MeetingData = z.infer<typeof meetingDataSchema>
 
+/** Guarda solo los bloques indicados, fusionándolos en el servidor con el meeting_data actual —
+ * así el guardado de un bloque nunca pisa lo que otro bloque haya guardado mientras tanto. */
 export const updateMeetingDataSchema = z.object({
   id: uuid,
-  meetingData: meetingDataSchema,
+  blocksPatch: z.record(z.string(), blockDataSchema),
 })
 export type UpdateMeetingDataInput = z.infer<typeof updateMeetingDataSchema>
 

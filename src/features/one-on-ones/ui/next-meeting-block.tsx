@@ -13,7 +13,7 @@ import { BlockShell } from './block-shell'
 import { updateNextMeetingAction } from '../application/update-next-meeting.action'
 import { updateMeetingDataAction } from '../application/update-meeting-data.action'
 import { SPECIAL_BLOCKS } from '../domain/one-on-one-templates'
-import type { BlockData, MeetingData } from '../domain/one-on-one.schema'
+import type { BlockData } from '../domain/one-on-one.schema'
 
 const EMPTY_BLOCK: BlockData = { status: 'pending', fields: {} }
 
@@ -24,16 +24,15 @@ function toDatetimeLocal(iso: string | null): string {
 export function NextMeetingBlock({
   meetingId,
   nextMeetingSuggestedAt,
-  meetingData,
+  initialBlock = EMPTY_BLOCK,
   readOnly = false,
 }: {
   meetingId: string
   nextMeetingSuggestedAt: string | null
-  meetingData: MeetingData
+  initialBlock?: BlockData
   readOnly?: boolean
 }) {
   const router = useRouter()
-  const initialBlock = meetingData.blocks.next_meeting ?? EMPTY_BLOCK
   const [date, setDate] = React.useState(toDatetimeLocal(nextMeetingSuggestedAt))
   const [objective, setObjective] = React.useState(initialBlock.fields.main_objective ?? '')
   const [completed, setCompleted] = React.useState(initialBlock.status === 'completed')
@@ -47,10 +46,7 @@ export function NextMeetingBlock({
     const nextBlock: BlockData = { status, fields: { ...initialBlock.fields, main_objective: objective } }
     const [dateResult, dataResult] = await Promise.all([
       updateNextMeetingAction({ id: meetingId, nextMeetingSuggestedAt: date || undefined }),
-      updateMeetingDataAction({
-        id: meetingId,
-        meetingData: { version: 1, blocks: { ...meetingData.blocks, next_meeting: nextBlock } },
-      }),
+      updateMeetingDataAction({ id: meetingId, blocksPatch: { next_meeting: nextBlock } }),
     ])
     setIsSaving(false)
 

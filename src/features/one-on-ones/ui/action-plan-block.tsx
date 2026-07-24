@@ -9,14 +9,14 @@ import { BlockShell } from './block-shell'
 import { MeetingActionsPanel } from './meeting-actions-panel'
 import { updateMeetingDataAction } from '../application/update-meeting-data.action'
 import { SPECIAL_BLOCKS } from '../domain/one-on-one-templates'
-import type { BlockData, MeetingData } from '../domain/one-on-one.schema'
+import type { BlockData } from '../domain/one-on-one.schema'
 import type { ActionRow } from '@/features/actions/infrastructure/actions.repository'
 
 const EMPTY_BLOCK: BlockData = { status: 'pending', fields: {} }
 
 export function ActionPlanBlock({
   meetingId,
-  meetingData,
+  initialBlock = EMPTY_BLOCK,
   actions,
   personId,
   managerId,
@@ -25,7 +25,7 @@ export function ActionPlanBlock({
   readOnly = false,
 }: {
   meetingId: string
-  meetingData: MeetingData
+  initialBlock?: BlockData
   actions: ActionRow[]
   personId: string
   managerId: string
@@ -34,7 +34,6 @@ export function ActionPlanBlock({
   readOnly?: boolean
 }) {
   const router = useRouter()
-  const initialBlock = meetingData.blocks.action_plan ?? EMPTY_BLOCK
   const [completed, setCompleted] = React.useState(initialBlock.status === 'completed')
   const [isSaving, setIsSaving] = React.useState(false)
 
@@ -46,7 +45,7 @@ export function ActionPlanBlock({
     const nextStatus: BlockData['status'] = checked ? 'completed' : actions.length > 0 ? 'in_progress' : 'pending'
     const result = await updateMeetingDataAction({
       id: meetingId,
-      meetingData: { version: 1, blocks: { ...meetingData.blocks, action_plan: { ...initialBlock, status: nextStatus } } },
+      blocksPatch: { action_plan: { ...initialBlock, status: nextStatus } },
     })
     setIsSaving(false)
 

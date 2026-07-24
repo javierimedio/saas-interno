@@ -19,7 +19,7 @@ export async function updateMeetingDataAction(input: UpdateMeetingDataInput): Pr
   const supabase = await createClient()
 
   try {
-    const meeting = await updateMeetingData(supabase, parsed.data.id, parsed.data.meetingData)
+    const meeting = await updateMeetingData(supabase, parsed.data.id, parsed.data.blocksPatch)
     revalidatePath(`/one-on-ones/${meeting.id}`)
     return ok(meeting)
   } catch (error) {
