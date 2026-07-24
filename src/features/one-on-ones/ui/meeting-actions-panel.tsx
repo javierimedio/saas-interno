@@ -33,6 +33,8 @@ export function MeetingActionsPanel({
 }) {
   const router = useRouter()
   const [title, setTitle] = React.useState('')
+  const [description, setDescription] = React.useState('')
+  const [dueDate, setDueDate] = React.useState('')
   const [assigneeId, setAssigneeId] = React.useState(personId)
   const [priority, setPriority] = React.useState<(typeof ACTION_PRIORITY)[number]>('medium')
   const [isCreating, setIsCreating] = React.useState(false)
@@ -40,13 +42,23 @@ export function MeetingActionsPanel({
   async function handleCreate() {
     if (title.trim().length === 0) return
     setIsCreating(true)
-    const result = await createActionAction({ personId, assigneeId, oneOnOneId, title, priority })
+    const result = await createActionAction({
+      personId,
+      assigneeId,
+      oneOnOneId,
+      title,
+      description: description || undefined,
+      dueDate: dueDate || undefined,
+      priority,
+    })
     setIsCreating(false)
     if (!result.ok) {
       toast.error(result.error)
       return
     }
     setTitle('')
+    setDescription('')
+    setDueDate('')
     router.refresh()
   }
 
@@ -69,43 +81,54 @@ export function MeetingActionsPanel({
       )}
 
       {!readOnly ? (
-        <div className="flex flex-wrap gap-2">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Crear acción rápida…"
-            className="flex-1"
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') {
-                e.preventDefault()
-                handleCreate()
-              }
-            }}
-          />
-          <Select value={assigneeId} onValueChange={setAssigneeId}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value={personId}>{personName}</SelectItem>
-              <SelectItem value={managerId}>{managerName}</SelectItem>
-            </SelectContent>
-          </Select>
-          <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
-            <SelectTrigger className="w-32">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {ACTION_PRIORITY.map((p) => (
-                <SelectItem key={p} value={p}>
-                  {ACTION_PRIORITY_LABELS[p]}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button variant="outline" onClick={handleCreate} disabled={isCreating || title.trim().length === 0}>
-            Crear
-          </Button>
+        <div className="flex flex-col gap-2">
+          <div className="flex flex-wrap gap-2">
+            <Input
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              placeholder="Crear acción rápida…"
+              className="flex-1"
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') {
+                  e.preventDefault()
+                  handleCreate()
+                }
+              }}
+            />
+            <Select value={assigneeId} onValueChange={setAssigneeId}>
+              <SelectTrigger className="w-40">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={personId}>{personName}</SelectItem>
+                <SelectItem value={managerId}>{managerName}</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={priority} onValueChange={(v) => setPriority(v as typeof priority)}>
+              <SelectTrigger className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                {ACTION_PRIORITY.map((p) => (
+                  <SelectItem key={p} value={p}>
+                    {ACTION_PRIORITY_LABELS[p]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Input
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              placeholder="Descripción (opcional)…"
+              className="flex-1"
+            />
+            <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} className="w-40" />
+            <Button variant="outline" onClick={handleCreate} disabled={isCreating || title.trim().length === 0}>
+              Crear
+            </Button>
+          </div>
         </div>
       ) : null}
     </div>

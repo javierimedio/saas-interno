@@ -3,10 +3,14 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import type { Database } from '@/shared/infrastructure/supabase/database.types'
 import type {
   CloseOneOnOneInput,
+  MeetingData,
   MeetingListFilters,
   ScheduleOneOnOneInput,
+  UpdateFeedbackInput,
+  UpdateNextMeetingInput,
   UpdateOneOnOneInput,
 } from '../domain/one-on-one.schema'
+import { resolveTemplateBlocks, type NarrativeBlockKey } from '../domain/one-on-one-templates'
 
 type TypedClient = SupabaseClient<Database>
 export type OneOnOneRow = Database['public']['Tables']['one_on_ones']['Row']
@@ -143,6 +147,12 @@ export async function scheduleMeeting(
   createdBy: string,
   input: ScheduleOneOnOneInput,
 ): Promise<OneOnOneRow> {
+  const blockKeys = resolveTemplateBlocks(input.templateKey, input.customBlockKeys as NarrativeBlockKey[] | undefined)
+  const meetingData: MeetingData = {
+    version: 1,
+    blocks: Object.fromEntries(blockKeys.map((key) => [key, { status: 'pending' as const, fields: {} }])),
+  }
+
   const { data, error } = await client
     .from('one_on_ones')
     .insert({
@@ -152,11 +162,48 @@ export async function scheduleMeeting(
       scheduled_at: input.scheduledAt,
       mode: input.mode,
       created_by: createdBy,
+      template_key: input.templateKey,
+      meeting_data: meetingData,
     })
     .select('*')
     .single()
 
   if (error) throw new Error(`No se pudo programar la reunión: ${error.message}`)
+  return data
+}
+
+/** "Guardar borrador": persiste el contenido narrativo completo (los bloques), tal cual lo tiene el cliente. */
+export async function updateMeetingData(client: TypedClient, id: string, meetingData: MeetingData): Promise<OneOnOneRow> {
+  const { data, error } = await client.from('one_on_ones').update({ meeting_data: meetingData }).eq('id', id).select('*').single()
+
+  if (error) throw new Error(`No se pudo guardar el borrador: ${error.message}`)
+  return data
+}
+
+export async function updateFeedback(client: TypedClient, input: UpdateFeedbackInput): Promise<OneOnOneRow> {
+  const { data, error } = await client
+    .from('one_on_ones')
+    .update({
+      manager_comments: input.managerComments || null,
+      employee_comments: input.employeeComments || null,
+    })
+    .eq('id', input.id)
+    .select('*')
+    .single()
+
+  if (error) throw new Error(`No se pudo guardar el feedback: ${error.message}`)
+  return data
+}
+
+export async function updateNextMeetingDate(client: TypedClient, input: UpdateNextMeetingInput): Promise<OneOnOneRow> {
+  const { data, error } = await client
+    .from('one_on_ones')
+    .update({ next_meeting_suggested_at: input.nextMeetingSuggestedAt || null })
+    .eq('id', input.id)
+    .select('*')
+    .single()
+
+  if (error) throw new Error(`No se pudo guardar la fecha del próximo One2One: ${error.message}`)
   return data
 }
 
@@ -196,7 +243,7 @@ export async function closeMeeting(client: TypedClient, input: CloseOneOnOneInpu
       status: 'completed',
       actual_ended_at: new Date().toISOString(),
       manager_comments: input.managerComments || null,
-      overall_rating: input.overallRating,
+      overall_rating: input.overallRating ?? null,
       next_meeting_suggested_at: input.nextMeetingSuggestedAt || null,
     })
     .eq('id', input.id)

@@ -5,6 +5,7 @@ import type { DocumentRow } from '../infrastructure/documents.repository'
 import type { PersonTimelineEvent } from '../domain/timeline-event'
 import type { OneOnOneRow } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
 import type { ActionRow } from '@/features/actions/infrastructure/actions.repository'
+import { ONE_ON_ONE_TEMPLATE_LABELS, type OneOnOneTemplateKey } from '@/features/one-on-ones/domain/one-on-one-templates'
 
 const FIELD_LABELS: Record<string, string> = {
   position_title: 'puesto',
@@ -76,13 +77,24 @@ function eventFromDocument(row: DocumentRow): PersonTimelineEvent {
 }
 
 function eventFromMeeting(row: OneOnOneRow): PersonTimelineEvent | null {
-  if (row.status !== 'completed' || !row.actual_ended_at) return null
+  if (row.status === 'cancelled') return null
+
+  if (row.status === 'completed' && row.actual_ended_at) {
+    return {
+      id: row.id,
+      type: 'one_on_one',
+      occurredAt: row.actual_ended_at,
+      title: 'One2One realizado',
+      detail: row.overall_rating ? `Valoración ${row.overall_rating}/5` : 'Sin valoración registrada',
+    }
+  }
+
   return {
     id: row.id,
     type: 'one_on_one',
-    occurredAt: row.actual_ended_at,
-    title: 'One2One realizado',
-    detail: row.overall_rating ? `Valoración ${row.overall_rating}/5` : undefined,
+    occurredAt: row.scheduled_at,
+    title: 'One2One programado',
+    detail: ONE_ON_ONE_TEMPLATE_LABELS[row.template_key as OneOnOneTemplateKey],
   }
 }
 

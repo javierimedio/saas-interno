@@ -422,6 +422,8 @@ export interface Database {
           employee_comments: string | null
           overall_rating: number | null
           next_meeting_suggested_at: string | null
+          template_key: string
+          meeting_data: Json
           created_by: string
           created_at: string
           updated_at: string
@@ -440,6 +442,8 @@ export interface Database {
           employee_comments?: string | null
           overall_rating?: number | null
           next_meeting_suggested_at?: string | null
+          template_key?: string
+          meeting_data?: Json
           created_by: string
           created_at?: string
           updated_at?: string
@@ -458,6 +462,8 @@ export interface Database {
           employee_comments?: string | null
           overall_rating?: number | null
           next_meeting_suggested_at?: string | null
+          template_key?: string
+          meeting_data?: Json
           created_by?: string
           created_at?: string
           updated_at?: string

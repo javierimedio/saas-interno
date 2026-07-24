@@ -22,14 +22,27 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { closeOneOnOneSchema, type CloseOneOnOneInput } from '../domain/one-on-one.schema'
 import { closeMeetingAction } from '../application/close-meeting.action'
 
-export function CloseMeetingDialog({ meetingId }: { meetingId: string }) {
+export function CloseMeetingDialog({
+  meetingId,
+  managerComments = '',
+  nextMeetingSuggestedAt = '',
+}: {
+  meetingId: string
+  managerComments?: string
+  nextMeetingSuggestedAt?: string
+}) {
   const router = useRouter()
   const [open, setOpen] = React.useState(false)
   const [isSubmitting, setIsSubmitting] = React.useState(false)
 
   const form = useForm<z.input<typeof closeOneOnOneSchema>, unknown, CloseOneOnOneInput>({
     resolver: zodResolver(closeOneOnOneSchema),
-    defaultValues: { id: meetingId, managerComments: '', overallRating: 4, nextMeetingSuggestedAt: '' },
+    defaultValues: {
+      id: meetingId,
+      managerComments,
+      overallRating: undefined,
+      nextMeetingSuggestedAt: nextMeetingSuggestedAt.slice(0, 16),
+    },
   })
 
   async function onSubmit(values: CloseOneOnOneInput) {
@@ -76,7 +89,7 @@ export function CloseMeetingDialog({ meetingId }: { meetingId: string }) {
               name="overallRating"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Valoración (1-5)</FormLabel>
+                  <FormLabel>Valoración (1-5, opcional)</FormLabel>
                   <FormControl>
                     <Input
                       type="number"

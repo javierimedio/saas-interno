@@ -4,6 +4,7 @@ import { buildPersonTimeline, groupTimelineByMonth } from '@/features/people/app
 import type { AuditLogRow } from '@/features/people/infrastructure/audit-log.repository'
 import type { SalaryRecordRow } from '@/features/people/infrastructure/salary-records.repository'
 import type { DocumentRow } from '@/features/people/infrastructure/documents.repository'
+import type { OneOnOneRow } from '@/features/one-on-ones/infrastructure/one-on-ones.repository'
 
 function auditRow(overrides: Partial<AuditLogRow>): AuditLogRow {
   return {
@@ -34,6 +35,18 @@ function salaryRow(overrides: Partial<SalaryRecordRow>): SalaryRecordRow {
     created_at: '2026-03-01T10:00:00Z',
     ...overrides,
   }
+}
+
+function meetingRow(overrides: Partial<OneOnOneRow>): OneOnOneRow {
+  return {
+    id: 'meeting-1',
+    status: 'scheduled',
+    scheduled_at: '2026-08-01T10:00:00Z',
+    actual_ended_at: null,
+    overall_rating: null,
+    template_key: 'periodic_follow_up',
+    ...overrides,
+  } as OneOnOneRow
 }
 
 function documentRow(overrides: Partial<DocumentRow>): DocumentRow {
@@ -96,6 +109,32 @@ describe('buildPersonTimeline', () => {
       [documentRow({ created_at: '2024-02-01T10:00:00Z' })],
     )
     expect(events.map((e) => e.type)).toEqual(['salary_change', 'document_added', 'hire'])
+  })
+})
+
+describe('buildPersonTimeline: reuniones One2One', () => {
+  it('incluye reuniones programadas (no solo completadas) con la plantilla como detalle', () => {
+    const events = buildPersonTimeline([], [], [], [meetingRow({ status: 'scheduled' })])
+    expect(events).toHaveLength(1)
+    expect(events[0].type).toBe('one_on_one')
+    expect(events[0].title).toBe('One2One programado')
+    expect(events[0].detail).toBe('Seguimiento periódico')
+  })
+
+  it('muestra la valoración en una reunión completada', () => {
+    const events = buildPersonTimeline(
+      [],
+      [],
+      [],
+      [meetingRow({ status: 'completed', actual_ended_at: '2026-08-01T11:00:00Z', overall_rating: 4 })],
+    )
+    expect(events[0].title).toBe('One2One realizado')
+    expect(events[0].detail).toBe('Valoración 4/5')
+  })
+
+  it('excluye las reuniones canceladas', () => {
+    const events = buildPersonTimeline([], [], [], [meetingRow({ status: 'cancelled' })])
+    expect(events).toHaveLength(0)
   })
 })
 
