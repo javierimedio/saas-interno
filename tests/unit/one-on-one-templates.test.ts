@@ -9,18 +9,18 @@ describe('resolveTemplateBlocks', () => {
     expect(blocks.slice(-2)).toEqual(['action_plan', 'next_meeting'])
   })
 
-  it('seguimiento periódico incluye cómo estás, balance y organización, sin feedback', () => {
+  it('seguimiento periódico empieza por la persona (cómo estás, organización) antes del balance, sin feedback', () => {
     const blocks = resolveTemplateBlocks('periodic_follow_up')
-    expect(blocks).toEqual(['preparation', 'how_are_you', 'balance', 'work_organization', 'action_plan', 'next_meeting'])
+    expect(blocks).toEqual(['preparation', 'how_are_you', 'work_organization', 'balance', 'action_plan', 'next_meeting'])
   })
 
-  it('evaluación anual incluye todos los bloques narrativos y feedback', () => {
+  it('evaluación anual incluye todos los bloques narrativos y feedback, empezando por la persona', () => {
     const blocks = resolveTemplateBlocks('annual_evaluation')
     expect(blocks).toEqual([
       'preparation',
       'how_are_you',
-      'balance',
       'work_organization',
+      'balance',
       'professional_development',
       'feedback',
       'action_plan',

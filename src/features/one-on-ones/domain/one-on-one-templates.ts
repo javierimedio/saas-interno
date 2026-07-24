@@ -16,16 +16,6 @@ export const NARRATIVE_BLOCKS = {
       { key: 'concerns', label: '¿Hay algo que te esté preocupando o quitando energía?' },
     ],
   },
-  balance: {
-    title: 'Balance desde el último One2One',
-    description: 'Reflexionemos sobre lo ocurrido desde la última vez que hablamos: qué merece la pena repetir, mejorar o aprender.',
-    fields: [
-      { key: 'went_well', label: 'Lo que ha funcionado bien' },
-      { key: 'difficulties', label: 'Dificultades' },
-      { key: 'learnings', label: 'Aprendizajes' },
-      { key: 'proudest', label: '¿De qué te sientes más orgulloso/a desde el último One2One?' },
-    ],
-  },
   work_organization: {
     title: 'Trabajo y organización',
     description: 'Busquemos oportunidades para mejorar procesos, eliminar bloqueos y trabajar de forma más eficiente.',
@@ -34,6 +24,16 @@ export const NARRATIVE_BLOCKS = {
       { key: 'organization', label: '¿Hay algo en cómo organizas tu trabajo que te gustaría cambiar?' },
       { key: 'blockers', label: '¿Hay algún bloqueo que dependa de otras personas o equipos?' },
       { key: 'collaboration', label: '¿Cómo está funcionando la colaboración con el resto del equipo?' },
+    ],
+  },
+  balance: {
+    title: 'Balance desde el último One2One',
+    description: 'Reflexionemos sobre lo ocurrido desde la última vez que hablamos: qué merece la pena repetir, mejorar o aprender.',
+    fields: [
+      { key: 'went_well', label: 'Lo que ha funcionado bien' },
+      { key: 'difficulties', label: 'Dificultades' },
+      { key: 'learnings', label: 'Aprendizajes' },
+      { key: 'proudest', label: '¿De qué te sientes más orgulloso/a desde el último One2One?' },
     ],
   },
   professional_development: {
@@ -92,12 +92,16 @@ export const ONE_ON_ONE_TEMPLATE_LABELS: Record<OneOnOneTemplateKey, string> = {
   custom: 'Personalizado',
 }
 
-/** Bloques narrativos de cada plantilla, en orden. preparation/action_plan/next_meeting se añaden siempre. */
+/**
+ * Bloques narrativos de cada plantilla, en orden. preparation/action_plan/next_meeting se añaden
+ * siempre. El orden empieza por la persona (cómo está, cómo organiza su trabajo) antes de entrar en
+ * balance/desempeño, para que la conversación no arranque evaluando resultados.
+ */
 const TEMPLATE_NARRATIVE_BLOCKS: Record<Exclude<OneOnOneTemplateKey, 'custom'>, NarrativeBlockKey[]> = {
   onboarding: ['onboarding_adaptation', 'onboarding_training', 'onboarding_difficulties', 'onboarding_initial_goals'],
-  periodic_follow_up: ['how_are_you', 'balance', 'work_organization'],
+  periodic_follow_up: ['how_are_you', 'work_organization', 'balance'],
   professional_development: ['professional_development'],
-  annual_evaluation: ['how_are_you', 'balance', 'work_organization', 'professional_development'],
+  annual_evaluation: ['how_are_you', 'work_organization', 'balance', 'professional_development'],
 }
 
 /** Plantillas que incluyen el bloque de feedback bidireccional además de sus bloques narrativos. */
